@@ -1,5 +1,2 @@
 # Spaceship-Command-Module
-Project for CS4341 Cohort
-\n
-Group Members: \n
-Austin, Nolan, Rahul, Ranveer
+Project for CS4341 Cohort. The group members are Austin, Nolan, Rahul, Ranveer
