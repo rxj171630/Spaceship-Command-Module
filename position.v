@@ -9,7 +9,7 @@ module DFF(clk, in, out);
   reg    out;
 
   always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
-  out = in; // The output is set to the same value of the input
+    out = in; // The output is set to the same value of the input
 endmodule
 
 
@@ -90,8 +90,9 @@ module Axis_Position (input clk,  input [3:0] mode_selector, input [3:0] pos_sel
   reg [15:0] position;
   wire [15:0] position_out;
 
-  wire [15:0] stealth_speed, defense_speed, attack_speed;
-  wire [15:0] warp_speed_value, adder_out;
+  reg [15:0] stealth_speed, defense_speed, attack_speed = 16'b1;
+  reg [15:0] warp_speed_value = 16'b1001001001;
+  wire [15:0] adder_out;
 
   wire [15:0] velocity_out, position_value;
 
@@ -121,7 +122,7 @@ module Axis_Position (input clk,  input [3:0] mode_selector, input [3:0] pos_sel
 endmodule
 
 module Spacial_Position(input clk, input [3:0] mode_selector, input [3:0] pos_selector);
-    reg [15:0] position_x_out, position_y_out, position_z_out;
+    reg [15:0] position_x, position_y, position_z;
     
     // Calculating 
     Axis_Position x(clk, mode_selector, pos_selector);
@@ -129,8 +130,14 @@ module Spacial_Position(input clk, input [3:0] mode_selector, input [3:0] pos_se
     Axis_Position z(clk, mode_selector, pos_selector);
     always @(*)
         begin
-            position_x_out = x.position;
-            position_y_out = y.position;
-            position_z_out = z.position;
+            position_x = x.position;
+            position_y = y.position;
+            position_z = z.position;
         end
+endmodule
+
+
+module TestBench();
+
+
 endmodule
