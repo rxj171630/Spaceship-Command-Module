@@ -1,11 +1,11 @@
 //=============================================
 // D Flip-Flop
 //=============================================
-module DFF(clk,in,out);
+module DFF(clk, in, out);
 
 input  clk; // The clock
-input  in;  // The input D
-output out; // The output Q
+input  [15:0] in;  // The input D
+output [15:0] out; // The output Q
 reg    out;
 
 always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
