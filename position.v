@@ -51,6 +51,7 @@ module Add_full (input a, b, c_in, output c_out, sum);
   Add_half M2 (w2, c_in, w3, sum);
   or (c_out, w1, w3);
 
+<<<<<<< HEAD
 endmodule
 
 //This contains 
@@ -62,3 +63,6 @@ module Spacial_Position();
     Axis_Position y();
     Axis_Position z();
 endmodule
+=======
+endmodule
+>>>>>>> c5ec5600be539b1091c1c0a6f52aa90ab0f8a60d
