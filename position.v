@@ -72,12 +72,12 @@ module Add_sub_rca4 (input Mode, input [3:0] a, b, input c_in, output c_out, out
   Full_Adder M3 (a[3], x_3, c_in3, c_out, sum[3]);
 endmodule
 
-//This contains 
+// This would be used to calculate the position on each axis
 module Axis_Position ();
-    DFF Q(clk, _in, _out);
-    Mux_4 mode();
-    Mux_4 velocity();
 
+    Mux_4 mode();
+    Mux_4 position();
+    DFF Q(clk, , );
 endmodule
 
 module Spacial_Position();
