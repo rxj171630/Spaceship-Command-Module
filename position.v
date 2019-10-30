@@ -3,13 +3,13 @@
 //=============================================
 module DFF(clk, in, out);
 
-input  clk; // The clock
-input  [15:0] in;  // The input D
-output [15:0] out; // The output Q
-reg    out;
+  input  clk; // The clock
+  input  [15:0] in;  // The input D
+  output [15:0] out; // The output Q
+  reg    out;
 
-always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
-out = in; // The output is set to the same value of the input
+  always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
+  out = in; // The output is set to the same value of the input
 endmodule
 
 
@@ -18,7 +18,7 @@ endmodule
 //=============================================
 
 module Mux4(a3, a2, a1, a0, s, b) ;
- parameter k = 3 ;//Three Bits Wide
+ parameter k = 16;//Three Bits Wide
  input [k-1:0] a3, a2, a1, a0 ;  // inputs
  input [3:0]   s ; // one-hot select
  output[k-1:0] b ;
@@ -87,34 +87,42 @@ endmodule
 
 //This is the module for calculating the position in a single axis
 module Axis_Position (input clk,  input [3:0] mode_selector, input [3:0] pos_selector);   
-    reg [15:0] position;
-    wire [15:0] position_out;
-    // 4 bit one hot values for the multiplexer mode
-    // 0001 is the reset 
-    // 0010 is the attack mode
-    // 0100 is the defense mode
-    // 1000 is the stealth mode
-    // The output of the mode multiplexer would be the velocity associated with that mode
-    Mux4 mode(stealth_speed, defense_speed, attack_speed, 16'b0, mode_selector, velocity_out);  // Add arbitary values for a1, a2 and a3
+  reg [15:0] position;
+  wire [15:0] position_out;
 
-    Add_sub_rca16 V_adder(1'b0, velocity_out, position, 1'b0, c_out, adder_out); // The adder would ouput the next position in the normal case
-    // 4 bit one hot values for the multiplexer position
-    // 0001 is the reset 
-    // 0010 is the normal result which is the sum of the previous position and current velocity/clk * clk = velocity
-    // 0100 is the warp speed mode
-    // 1000 is a dont care value and should never appear
-    Mux4 position(16'b1, warp_speed_value, adder_out, 16'b0, pos_selector, position_value);  // Set the warp speed to an arbitary large value // teleportation pretty much
+  wire [15:0] stealth_speed, defense_speed, attack_speed;
+  wire [15:0] warp_speed_value, adder_out;
 
-    // Its gonna take the output of the position multiplexer
-    DFF Q(clk, position_value, position_out);
+  wire [15:0] velocity_out, position_value;
 
-    always @(*)
-        begin
-           position = position_out; 
-        end
+  // 4 bit one hot values for the multiplexer mode
+  // 0001 is the reset 
+  // 0010 is the attack mode
+  // 0100 is the defense mode
+  // 1000 is the stealth mode
+  // The output of the mode multiplexer would be the velocity associated with that mode
+  Mux4 mode_mux(stealth_speed, defense_speed, attack_speed, 16'b0, mode_selector, velocity_out);  // Add arbitary values for a1, a2 and a3
+
+  Add_sub_rca16 V_adder(1'b0, velocity_out, position, 1'b0, c_out, adder_out); // The adder would ouput the next position in the normal case
+  // 4 bit one hot values for the multiplexer position
+  // 0001 is the reset 
+  // 0010 is the normal result which is the sum of the previous position and current velocity/clk * clk = velocity
+  // 0100 is the warp speed mode
+  // 1000 is a dont care value and should never appear
+  Mux4 position_mux(16'b1, warp_speed_value, adder_out, 16'b0, pos_selector, position_value);  // Set the warp speed to an arbitary large value // teleportation pretty much
+
+  // Its gonna take the output of the position multiplexer
+  DFF Q(clk, position_value, position_out);
+
+  always @(*)
+    begin
+        position = position_out; 
+    end
 endmodule
 
-module Spacial_Position(input clk, input [3:0] mode_selector, input [3:0] pos_selector, output [15:0] position_x_out, position_y_out, position_z_out);
+module Spacial_Position(input clk, input [3:0] mode_selector, input [3:0] pos_selector);
+    reg [15:0] position_x_out, position_y_out, position_z_out;
+    
     // Calculating 
     Axis_Position x(clk, mode_selector, pos_selector);
     Axis_Position y(clk, mode_selector, pos_selector);
