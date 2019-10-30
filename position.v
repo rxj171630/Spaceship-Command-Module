@@ -32,7 +32,7 @@ endmodule
   This is the module for implementing the half adder with two inputs
   a and b as well as two outpus c_out (out carry) and sum
 */
-module Add_half (input a, b, output c_out, sum);
+module Half_Adder (input a, b, output c_out, sum);
   //Using XOR gate to produce the sum
   xor G1(sum, a, b);
   //Using AND gate to generate the carry output
@@ -43,19 +43,41 @@ endmodule
   This is the module for implementing the full adder. We have three inputs, a and b
   as well as the carry in c_in and two outputs, c_out (outcarry) and sum
 */
-module Add_full (input a, b, c_in, output c_out, sum);
+module Full_Adder (input a, b, c_in, output c_out, sum);
   wire w1, w2, w3;   // Wires used to store outputs
 
   //Using two half adders and an OR gates for a full adder
-  Add_half M1 (a, b, w1, w2);
-  Add_half M2 (w2, c_in, w3, sum);
+  Half_Adder M1 (a, b, w1, w2);
+  Half_Adder M2 (w2, c_in, w3, sum);
   or (c_out, w1, w3);
 
-<<<<<<< HEAD
+endmodule
+
+//This is the 4 bit adder-subtractor for the circuit
+module Add_sub_rca4 (input Mode, input [3:0] a, b, input c_in, output c_out, output [3:0] sum);
+
+  //Wires for storing bits
+  wire c_in1, c_in2, c_in3, c_in4;
+  wire x_0, x_1, x_2, x_3;
+  // If the mode is subtraction(1), we would basically invert the bits in B using XOR.
+  xor X1(x_0,Mode,b[0]);
+  xor X1(x_1,Mode,b[1]);
+  xor X2(x_2,Mode,b[2]);
+  xor X3(x_3,Mode,b[3]);
+
+  //We are calling the 4 adders to display the proper result
+  Full_Adder M0 (a[0], x_0, c_in, c_in1, sum[0]);
+  Full_Adder M1 (a[1], x_1, c_in1, c_in2, sum[1]);
+  Full_Adder M2 (a[2], x_2, c_in2, c_in3, sum[2]);
+  Full_Adder M3 (a[3], x_3, c_in3, c_out, sum[3]);
 endmodule
 
 //This contains 
 module Axis_Position ();
+    DFF Q(clk, _in, _out);
+    Mux_4 mode();
+    Mux_4 velocity();
+
 endmodule
 
 module Spacial_Position();
@@ -63,6 +85,3 @@ module Spacial_Position();
     Axis_Position y();
     Axis_Position z();
 endmodule
-=======
-endmodule
->>>>>>> c5ec5600be539b1091c1c0a6f52aa90ab0f8a60d
