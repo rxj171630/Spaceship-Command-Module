@@ -3,13 +3,13 @@
 //=============================================
 module DFF(clk, in, out);
 
-input  clk; // The clock
-input  [15:0] in;  // The input D
-output [15:0] out; // The output Q
-reg    out;
+  input  clk; // The clock
+  input  [15:0] in;  // The input D
+  output [15:0] out; // The output Q
+  reg    out;
 
-always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
-out = in; // The output is set to the same value of the input
+  always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
+  out = in; // The output is set to the same value of the input
 endmodule
 
 
