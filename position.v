@@ -72,6 +72,20 @@ module Add_sub_rca4 (input Mode, input [3:0] a, b, input c_in, output c_out, out
   Full_Adder M3 (a[3], x_3, c_in3, c_out, sum[3]);
 endmodule
 
+module Add_sub_rca16 (input Mode, input [15:0] a, b, input c_in, output c_out, output [15:0] sum);
+
+  //Wires for storing bits
+  wire c_in1, c_in2, c_in3, c_in4;
+
+  //We are calling the 4 adders to display the proper result
+  Full_Adder M0 (Mode, a[3:0], b[3:0], c_in, c_in1, sum[0]);
+  Full_Adder M1 (Mode, a[7:4], b[7:4], c_in1, c_in2, sum[1]);
+  Full_Adder M2 (Mode, a[11:8], b[11:8], c_in2, c_in3, sum[2]);
+  Full_Adder M3 (Mode, a[15:12], b[15:12], c_in3, c_out, sum[3]);
+
+endmodule
+
+
 //This contains 
 module Axis_Position ();
     DFF Q(clk, _in, _out);
