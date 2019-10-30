@@ -85,12 +85,26 @@ module Add_sub_rca16 (input Mode, input [15:0] a, b, input c_in, output c_out, o
 endmodule
 
 
-//This contains 
+//This is the module for calculating the position in a single axis
 module Axis_Position ();
-    DFF Q(clk, _in, _out);
+    
+    // 4 bit one hot values for the multiplexer mode
+    // 0001 is the reset 
+    // 0010 is the attack mode
+    // 0100 is the defense mode
+    // 1000 is the stealth mode
+    // The output of the mode multiplexer would be the velocity associated with that mode
     Mux_4 mode();
-    Mux_4 velocity();
 
+    // 4 bit one hot values for the multiplexer position
+    // 0001 is the reset 
+    // 0010 is the normal result which is the sum of the previous position and current velocity/clk * clk = velocity
+    // 0100 is the warp speed mode
+    // 1000 is a dont care value and should never appear
+    Mux_4 position();
+
+    // Its gonna take the output of the position multiplexer
+    DFF Q(clk, , );
 endmodule
 
 module Spacial_Position();
