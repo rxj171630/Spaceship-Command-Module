@@ -149,19 +149,20 @@ endmodule
 
 
 module TestBench();
+  parameter k = 16;
 
   reg clk;
   reg [3:0] mode;
   reg [3:0] pos_mode;
-  reg [15:0] jump_position_x = 'b1001001001;
-  reg [15:0] jump_position_y = 'b1001001001;
-  reg [15:0] jump_position_z = 'b1001001001;
+  reg [k-1:0] jump_position_x = 'b1001001001;
+  reg [k-1:0] jump_position_y = 'b1001001001;
+  reg [k-1:0] jump_position_z = 'b1001001001;
 
-  reg [15:0] x;
-  reg [15:0] y;
-  reg [15:0] z;
+  reg [k-1:0] x;
+  reg [k-1:0] y;
+  reg [k-1:0] z;
 
-  Position #(16) position(clk, mode, pos_mode, {jump_position_x, jump_position_y, jump_position_z});
+  Position #(k) position(clk, mode, pos_mode, {jump_position_x, jump_position_y, jump_position_z});
 
 	//---------------------------------------------
 	//The Display Thread with Clock Control
