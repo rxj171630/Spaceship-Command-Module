@@ -1,15 +1,16 @@
 //=============================================
 // D Flip-Flop
 //=============================================
-module DFF(clk, in, out);
+module DFF(clk,in,out);
+	parameter k = 16;
 
-  input  clk; // The clock
-  input  [15:0] in;  // The input D
-  output [15:0] out; // The output Q
-  reg    out;
+  input  clk;
+	input  [k-1:0] in;
+	output [k-1:0] out;
+	reg    [k-1:0] out;
 
   always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
-    out = in; // The output is set to the same value of the input
+  out = in;
 endmodule
 
 
@@ -18,14 +19,14 @@ endmodule
 //=============================================
 
 module Mux4(a3, a2, a1, a0, s, b) ;
- parameter k = 16;//Three Bits Wide
- input [k-1:0] a3, a2, a1, a0 ;  // inputs
- input [3:0]   s ; // one-hot select
- output[k-1:0] b ;
- assign b = ({k{s[3]}} & a3) |
-              ({k{s[2]}} & a2) |
-              ({k{s[1]}} & a1) |
-              ({k{s[0]}} & a0) ;
+  parameter k = 16;//number of bits
+  input [k-1:0] a3, a2, a1, a0 ;  // inputs
+  input [3:0]   s ; // one-hot select
+  output[k-1:0] b ;
+  assign b = ({k{s[3]}} & a3) |
+             ({k{s[2]}} & a2) |
+             ({k{s[1]}} & a1) |
+             ({k{s[0]}} & a0) ;
 endmodule
 
 /*
@@ -86,15 +87,21 @@ endmodule
 
 
 //This is the module for calculating the position in a single axis
-module Axis_Position (input clk,  input [3:0] mode_selector, input [3:0] pos_selector);   
-  reg [15:0] position;
-  wire [15:0] position_out;
+module Axis_Position (clk, mode, pos_mode, jump_position);   
 
-  reg [15:0] stealth_speed, defense_speed, attack_speed = 16'b1;
-  reg [15:0] warp_speed_value = 16'b1001001001;
-  wire [15:0] adder_out;
+  parameter k = 16;
+  parameter [k-1:0] ATTACK_SPEED = {{k-1{1'b0}},1'b1};  // speed when mode is attack
+  parameter [k-1:0] STEALTH_SPEED = {{k-1{1'b0}},1'b1}; // speed when mode is steath
+  parameter [k-1:0] DEFENSE_SPEED = {{k-1{1'b0}},1'b1}; // speed when mode is defense
+  
+  input clk;
+  input [3:0] mode;
+  input [3:0] pos_mode; 
+  input [k-1:0] jump_position; // position to jump to
 
-  wire [15:0] velocity_out, position_value;
+  wire [k-1:0] position, next_position;
+  wire [k-1:0] adder_out;
+  wire [k-1:0] velocity_out;
 
   // 4 bit one hot values for the multiplexer mode
   // 0001 is the reset 
@@ -102,37 +109,35 @@ module Axis_Position (input clk,  input [3:0] mode_selector, input [3:0] pos_sel
   // 0100 is the defense mode
   // 1000 is the stealth mode
   // The output of the mode multiplexer would be the velocity associated with that mode
-  Mux4 mode_mux(stealth_speed, defense_speed, attack_speed, 16'b0, mode_selector, velocity_out);  // Add arbitary values for a1, a2 and a3
+  Mux4 mode_mux(STEALTH_SPEED, DEFENSE_SPEED, ATTACK_SPEED, 16'b0, mode, velocity_out);  // Add arbitary values for a1, a2 and a3
 
   Add_sub_rca16 V_adder(1'b0, velocity_out, position, 1'b0, c_out, adder_out); // The adder would ouput the next position in the normal case
+
   // 4 bit one hot values for the multiplexer position
   // 0001 is the reset 
-  // 0010 is the normal result which is the sum of the previous position and current velocity/clk * clk = velocity
-  // 0100 is the warp speed mode
+  // 0010 is the sublight which is the sum of the current position and velocity
+  // 0100 is the jump mode
   // 1000 is a dont care value and should never appear
-  Mux4 position_mux(16'b1, warp_speed_value, adder_out, 16'b0, pos_selector, position_value);  // Set the warp speed to an arbitary large value // teleportation pretty much
+  Mux4 position_mux({{k-1{1'b0}},1'b1}, jump_position, adder_out, {k{1'b0}}, pos_mode, next_position);  // Set the warp speed to an arbitary large value // teleportation pretty much
 
   // Its gonna take the output of the position multiplexer
-  DFF Q(clk, position_value, position_out);
+  DFF #(k) Q(clk, next_position, position);
 
-  always @(*)
-    begin
-        position = position_out; 
-    end
 endmodule
 
-module Spacial_Position(input clk, input [3:0] mode_selector, input [3:0] pos_selector);
-    reg [15:0] position_x, position_y, position_z;
+module Position(input clk, input [3:0] mode_selector, input [3:0] pos_mode);
+    parameter k = 16;
+    reg [k-1:0] x, y, z;
     
     // Calculating 
-    Axis_Position x(clk, mode_selector, pos_selector);
-    Axis_Position y(clk, mode_selector, pos_selector);
-    Axis_Position z(clk, mode_selector, pos_selector);
+    Axis_Position #(k) x_pos(clk, mode_selector, pos_mode, 16'b1001001001);
+    Axis_Position #(k) y_pos(clk, mode_selector, pos_mode, 16'b1001001001);
+    Axis_Position #(k) z_pos(clk, mode_selector, pos_mode, 16'b1001001001);
     always @(*)
         begin
-            position_x = x.position;
-            position_y = y.position;
-            position_z = z.position;
+            x = x_pos.position;
+            y = y_pos.position;
+            z = z_pos.position;
         end
 endmodule
 
