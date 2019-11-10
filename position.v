@@ -104,7 +104,7 @@ module Axis_Position (clk, mode, pos_mode, jump_position);
   wire [k-1:0] velocity_out;
 
   // 4 bit one hot values for the multiplexer mode
-  // 0001 is the reset 
+  // 0001 is zero speed 
   // 0010 is the attack mode
   // 0100 is the defense mode
   // 1000 is the stealth mode
@@ -125,24 +125,86 @@ module Axis_Position (clk, mode, pos_mode, jump_position);
 
 endmodule
 
-module Position(input clk, input [3:0] mode_selector, input [3:0] pos_mode);
-    parameter k = 16;
-    reg [k-1:0] x, y, z;
-    
-    // Calculating 
-    Axis_Position #(k) x_pos(clk, mode_selector, pos_mode, 16'b1001001001);
-    Axis_Position #(k) y_pos(clk, mode_selector, pos_mode, 16'b1001001001);
-    Axis_Position #(k) z_pos(clk, mode_selector, pos_mode, 16'b1001001001);
-    always @(*)
-        begin
-            x = x_pos.position;
-            y = y_pos.position;
-            z = z_pos.position;
-        end
+module Position(clk, mode_selector, pos_mode, jump_position);
+  parameter k = 16;
+
+  input clk;
+  input [3:0] mode_selector;
+  input [3:0] pos_mode;
+  input [3*k-1:0] jump_position;
+
+  reg [k-1:0] x, y, z;
+  
+  // Calculating 
+  Axis_Position #(k) x_pos(clk, mode_selector, pos_mode, jump_position[k-1:0]);
+  Axis_Position #(k) y_pos(clk, mode_selector, pos_mode, jump_position[2*k-1:k]);
+  Axis_Position #(k) z_pos(clk, mode_selector, pos_mode, jump_position[3*k-1:2*k]);
+  always @(*)
+      begin
+          x = x_pos.position;
+          y = y_pos.position;
+          z = z_pos.position;
+      end
 endmodule
 
 
 module TestBench();
+
+  reg clk;
+  reg [3:0] mode;
+  reg [3:0] pos_mode;
+  reg [15:0] jump_position_x = 'b1001001001;
+  reg [15:0] jump_position_y = 'b1001001001;
+  reg [15:0] jump_position_z = 'b1001001001;
+
+  reg [15:0] x;
+  reg [15:0] y;
+  reg [15:0] z;
+
+  Position #(16) position(clk, mode, pos_mode, {jump_position_x, jump_position_y, jump_position_z});
+
+	//---------------------------------------------
+	//The Display Thread with Clock Control
+	//---------------------------------------------
+	initial
+		begin
+		forever
+			begin
+				#5 
+				clk = 0;
+				#5
+				clk = 1;
+			end
+	end	
+
+
+  	//---------------------------------------------
+	//The Display Thread with Clock Control
+	//---------------------------------------------
+	initial
+		begin
+		#1 ///Offset the Square Wave
+		$display("CLK| x | y | z |");
+		$display("---+---+---+---+");
+		forever
+			begin
+				#10
+				$display(" %b |%d|%d|%d|",clk, position.x, position.y, position.z);
+			end
+	end	
+
+	initial 
+		begin
+			#2 //Offset the Square Wave
+      #10 mode = 'b0001; pos_mode = 'b0001;
+      #10 mode = 'b0010; pos_mode = 'b0010;
+			#50
+      #10 mode = 'b0010; pos_mode = 'b0100;
+      #10 mode = 'b0010; pos_mode = 'b0010;
+			#50
+			
+			$finish;
+		end
 
 
 endmodule
