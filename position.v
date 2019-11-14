@@ -1,3 +1,7 @@
+`define X k-1:0
+`define Y 2*k-1:k
+`define Z 3*k-1:2*k
+
 //=============================================
 // D Flip-Flop
 //=============================================
@@ -87,31 +91,21 @@ endmodule
 
 
 //This is the module for calculating the position in a single axis
-module Axis_Position (clk, mode, pos_mode, jump_position);   
+module Axis_Position (clk, pos_mode, jump_position, velocity);   
 
   parameter k = 16;
-  parameter [k-1:0] ATTACK_SPEED = {{k-1{1'b0}},1'b1};  // speed when mode is attack
-  parameter [k-1:0] STEALTH_SPEED = {{k-1{1'b0}},1'b1}; // speed when mode is steath
-  parameter [k-1:0] DEFENSE_SPEED = {{k-1{1'b0}},1'b1}; // speed when mode is defense
   
   input clk;
-  input [3:0] mode;
   input [3:0] pos_mode; 
   input [k-1:0] jump_position; // position to jump to
+  input [k-1:0] velocity;
 
   wire [k-1:0] position, next_position;
   wire [k-1:0] adder_out;
-  wire [k-1:0] velocity_out;
+  
 
-  // 4 bit one hot values for the multiplexer mode
-  // 0001 is zero speed 
-  // 0010 is the attack mode
-  // 0100 is the defense mode
-  // 1000 is the stealth mode
-  // The output of the mode multiplexer would be the velocity associated with that mode
-  Mux4 mode_mux(STEALTH_SPEED, DEFENSE_SPEED, ATTACK_SPEED, 16'b0, mode, velocity_out);  // Add arbitary values for a1, a2 and a3
 
-  Add_sub_rca16 V_adder(1'b0, velocity_out, position, 1'b0, c_out, adder_out); // The adder would ouput the next position in the normal case
+  Add_sub_rca16 V_adder(1'b0, velocity, position, 1'b0, c_out, adder_out); // The adder would ouput the next position in the normal case
 
   // 4 bit one hot values for the multiplexer position
   // 0001 is the reset 
@@ -125,20 +119,21 @@ module Axis_Position (clk, mode, pos_mode, jump_position);
 
 endmodule
 
-module Position(clk, mode_selector, pos_mode, jump_position);
+module Position(clk, mode, pos_mode, jump_position, velocity_x, velocity_y, velocity_z);
   parameter k = 16;
 
   input clk;
-  input [3:0] mode_selector;
+  input [3:0] mode;
   input [3:0] pos_mode;
   input [3*k-1:0] jump_position;
+  input [k-1:0] velocity_x, velocity_y, velocity_z;
 
   reg [k-1:0] x, y, z;
   
   // Calculating 
-  Axis_Position #(k) x_pos(clk, mode_selector, pos_mode, jump_position[k-1:0]);
-  Axis_Position #(k) y_pos(clk, mode_selector, pos_mode, jump_position[2*k-1:k]);
-  Axis_Position #(k) z_pos(clk, mode_selector, pos_mode, jump_position[3*k-1:2*k]);
+  Axis_Position #(k) x_pos(clk, pos_mode, jump_position[k-1:0], velocity_x);
+  Axis_Position #(k) y_pos(clk, pos_mode, jump_position[2*k-1:k], velocity_y);
+  Axis_Position #(k) z_pos(clk, pos_mode, jump_position[3*k-1:2*k], velocity_z);
   always @(*)
       begin
           x = x_pos.position;
@@ -147,22 +142,63 @@ module Position(clk, mode_selector, pos_mode, jump_position);
       end
 endmodule
 
+module Axis_Velocity(mode, stealth_speed, defense_speed, attack_speed, velocity);
+  parameter k = 16;
+
+  input [3:0] mode;
+  input [k-1:0] stealth_speed, defense_speed, attack_speed;
+  output [k-1:0] velocity;
+
+  // 4 bit one hot values for the multiplexer mode
+  // 0001 is zero speed 
+  // 0010 is the attack mode
+  // 0100 is the defense mode
+  // 1000 is the stealth mode
+  // The output of the mode multiplexer would be the velocity associated with that mode
+  Mux4 velocity_mux(stealth_speed, defense_speed, attack_speed, 16'b0, mode, velocity);  // Add arbitary values for a1, a2 and a3
+endmodule
+
+module Velocity(mode, stealth_speed, defense_speed, attack_speed);
+  parameter k = 16;
+
+  input [3:0] mode;
+  input [3*k-1:0] stealth_speed, defense_speed, attack_speed;
+  wire  [k-1:0] x, y, z;  
+  reg [k-1:0] x_velocity, y_velocity, z_velocity;  
+
+
+  Axis_Velocity #(k) x_vel(mode, stealth_speed[k-1:0], defense_speed[k-1:0], attack_speed[k-1:0], x);
+  Axis_Velocity #(k) y_vel(mode, stealth_speed[2*k-1:k], defense_speed[2*k-1:k], attack_speed[2*k-1:k], y);
+  Axis_Velocity #(k) z_vel(mode, stealth_speed[3*k-1:2*k], defense_speed[3*k-1:2*k], attack_speed[3*k-1:2*k], z);
+  always @(*)
+  begin
+    x_velocity = x;
+    y_velocity = y;
+    z_velocity = z;
+  end
+endmodule
 
 module TestBench();
   parameter k = 16;
 
+
   reg clk;
   reg [3:0] mode;
   reg [3:0] pos_mode;
-  reg [k-1:0] jump_position_x = 'b1001001001;
-  reg [k-1:0] jump_position_y = 'b1001001001;
-  reg [k-1:0] jump_position_z = 'b1001001001;
+  
+  reg [3*k-1:0] jump_position;
+  
+  reg [3*k-1:0] stealth_speed = {16'b1,16'b1,16'b1};
+  reg [3*k-1:0] defense_speed = {16'b1,16'b1,16'b1};
+  reg [3*k-1:0] attack_speed  = {16'b1,16'b1,16'b1};
 
   reg [k-1:0] x;
   reg [k-1:0] y;
   reg [k-1:0] z;
 
-  Position #(k) position(clk, mode, pos_mode, {jump_position_x, jump_position_y, jump_position_z});
+  Velocity #(k) velocity(mode, stealth_speed, defense_speed, attack_speed);
+
+  Position #(k) position(clk, mode, pos_mode, jump_position, velocity.x_velocity, velocity.y_velocity, velocity.z_velocity);
 
 	//---------------------------------------------
 	//The Display Thread with Clock Control
@@ -194,14 +230,16 @@ module TestBench();
 			end
 	end	
 
+
+
 	initial 
 		begin
 			#2 //Offset the Square Wave
       #10 mode = 'b0001; pos_mode = 'b0001;
       #10 mode = 'b0010; pos_mode = 'b0010;
 			#50
-      #10 mode = 'b0010; pos_mode = 'b0100;
-      #10 mode = 'b0010; pos_mode = 'b0010;
+      #10 mode = 'b0010; pos_mode = 'b0100; jump_position[`X] = 100; jump_position[`Y] = 100; jump_position[`Z] = 100;
+      #10 mode = 'b0010; pos_mode = 'b0010; attack_speed[`Y] = -20;
 			#50
 			
 			$finish;
