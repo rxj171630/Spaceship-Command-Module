@@ -145,11 +145,19 @@ SaturationCounter sat(clk, rst, up, down, load, loadMax, ammoIn, ammoOut);
    	end
 endmodule
 
-module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input fire);
+module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input fire, output error);
   wire mode;
-  reg enableFire; //used to determine error state
+  reg error;
   Mux4_1 selMode(1'b0, 1'b0, 1'b1, 1'b0, mode_selector, mode);  //0010 is attack mode
   ammoCount run(clk, ammo, fire);
+
+  initial begin
+  forever begin
+  #5
+    error = ((fire & (!mode)) | (fire & (!ammo)));
+    $display("error: %b", error);
+    end
+  end
 endmodule
 
 module testBench();
@@ -157,7 +165,8 @@ module testBench();
   reg [3:0]mode_selector;
   reg [8:0]ammo;
   reg fire;
-  weapons try(clk, mode_selector, ammo, fire);
+  wire error;
+  weapons try(clk, mode_selector, ammo, fire, error);
   //============================================
   //Set initial values
   //============================================
