@@ -2,6 +2,14 @@
 `define Y 2*k-1:k
 `define Z 3*k-1:2*k
 
+`define RESET   'b0001
+`define ATTACK  'b0010
+`define DEFENSE 'b0100
+`define STEALTH 'b1000
+`define JUMP   'b0100
+`define NORMAL 'b0010
+
+
 //=============================================
 // D Flip-Flop
 //=============================================
@@ -33,62 +41,6 @@ module Mux4(a3, a2, a1, a0, s, b) ;
              ({k{s[0]}} & a0) ;
 endmodule
 
-/*
-  This is the module for implementing the half adder with two inputs
-  a and b as well as two outpus c_out (out carry) and sum
-*/
-module Half_Adder (input a, b, output c_out, sum);
-  //Using XOR gate to produce the sum
-  xor G1(sum, a, b);
-  //Using AND gate to generate the carry output
-  and G2(c_out, a, b );  // This is the carry output generated for the program
-endmodule
-
-/*
-  This is the module for implementing the full adder. We have three inputs, a and b
-  as well as the carry in c_in and two outputs, c_out (outcarry) and sum
-*/
-module Full_Adder (input a, b, c_in, output c_out, sum);
-  wire w1, w2, w3;   // Wires used to store outputs
-
-  //Using two half adders and an OR gates for a full adder
-  Half_Adder M1 (a, b, w1, w2);
-  Half_Adder M2 (w2, c_in, w3, sum);
-  or (c_out, w1, w3);
-
-endmodule
-
-//This is the 4 bit adder-subtractor for the circuit
-module Add_sub_rca4 (input Mode, input [3:0] a, b, input c_in, output c_out, output [3:0] sum);
-
-  //Wires for storing bits
-  wire c_in1, c_in2, c_in3, c_in4;
-  wire x_0, x_1, x_2, x_3;
-  // If the mode is subtraction(1), we would basically invert the bits in B using XOR.
-  xor X1(x_0,Mode,b[0]);
-  xor X1(x_1,Mode,b[1]);
-  xor X2(x_2,Mode,b[2]);
-  xor X3(x_3,Mode,b[3]);
-
-  //We are calling the 4 adders to display the proper result
-  Full_Adder M0 (a[0], x_0, c_in, c_in1, sum[0]);
-  Full_Adder M1 (a[1], x_1, c_in1, c_in2, sum[1]);
-  Full_Adder M2 (a[2], x_2, c_in2, c_in3, sum[2]);
-  Full_Adder M3 (a[3], x_3, c_in3, c_out, sum[3]);
-endmodule
-
-module Add_sub_rca16 (input Mode, input [15:0] a, b, input c_in, output c_out, output [15:0] sum);
-
-  //Wires for storing bits
-  wire c_in1, c_in2, c_in3, c_in4;
-
-  //We are calling the 4 adders to display the proper result
-  Add_sub_rca4 M0 (Mode, a[3:0], b[3:0], c_in, c_in1, sum[3:0]);//1st 4 bits
-  Add_sub_rca4 M1 (Mode, a[7:4], b[7:4], c_in1, c_in2, sum[7:4]);//2nd 4 bits
-  Add_sub_rca4 M2 (Mode, a[11:8], b[11:8], c_in2, c_in3, sum[11:8]);//3rd 4 bits
-  Add_sub_rca4 M3 (Mode, a[15:12], b[15:12], c_in3, c_out, sum[15:12]);//4th 4 bits
-endmodule
-
 
 //This is the module for calculating the position in a single axis
 module Axis_Position (clk, pos_mode, jump_position, velocity);   
@@ -103,9 +55,9 @@ module Axis_Position (clk, pos_mode, jump_position, velocity);
   wire [k-1:0] position, next_position;
   wire [k-1:0] adder_out;
   
+  assign adder_out = position + velocity;
 
-
-  Add_sub_rca16 V_adder(1'b0, velocity, position, 1'b0, c_out, adder_out); // The adder would ouput the next position in the normal case
+   // The adder would ouput the next position in the normal case
 
   // 4 bit one hot values for the multiplexer position
   // 0001 is the reset 
@@ -119,35 +71,46 @@ module Axis_Position (clk, pos_mode, jump_position, velocity);
 
 endmodule
 
-module Position(clk, mode, pos_mode, jump_position, velocity_x, velocity_y, velocity_z);
+module Position(clk, mode, pos_mode, jump_position, velocity);
   parameter k = 16;
 
   input clk;
   input [3:0] mode;
   input [3:0] pos_mode;
-  input [3*k-1:0] jump_position;
-  input [k-1:0] velocity_x, velocity_y, velocity_z;
+  input [3*k-1:0] jump_position;// in the form {X, Y, Z}
+  input [3*k-1:0] velocity;// in the form {X, Y, Z}
 
-  reg [k-1:0] x, y, z;
+  reg [3*k-1:0] position;
   
   // Calculating 
-  Axis_Position #(k) x_pos(clk, pos_mode, jump_position[k-1:0], velocity_x);
-  Axis_Position #(k) y_pos(clk, pos_mode, jump_position[2*k-1:k], velocity_y);
-  Axis_Position #(k) z_pos(clk, pos_mode, jump_position[3*k-1:2*k], velocity_z);
+  Axis_Position #(k) x_pos(clk, pos_mode, jump_position[`X], velocity[`X]);//Calulates x positon
+  Axis_Position #(k) y_pos(clk, pos_mode, jump_position[`Y], velocity[`Y]);//Calculates y position
+  Axis_Position #(k) z_pos(clk, pos_mode, jump_position[`Z], velocity[`Z]);//Calulates z position
   always @(*)
       begin
-          x = x_pos.position;
-          y = y_pos.position;
-          z = z_pos.position;
+          position[`X] = x_pos.position;
+          position[`Y] = y_pos.position;
+          position[`Z] = z_pos.position;
       end
 endmodule
 
-module Axis_Velocity(mode, stealth_speed, defense_speed, attack_speed, velocity);
+module Axis_Velocity(mode, speed, velocity);
   parameter k = 16;
+  
+  `define STEALTH_OFFSET 3
+  `define DEFENSE_OFFSET 2
+  `define ATTACK_OFFSET 1
+
 
   input [3:0] mode;
-  input [k-1:0] stealth_speed, defense_speed, attack_speed;
-  output [k-1:0] velocity;
+  input [k-1:0] speed;//default speed
+  output [k-1:0] velocity;//adjusted speed
+
+  //Takes speed and applies offset based on mode
+  wire [k-1:0] stealth_speed, defense_speed, attack_speed;
+  assign stealth_speed = speed / `STEALTH_OFFSET;
+  assign defense_speed = speed / `DEFENSE_OFFSET;
+  assign attack_speed = speed / `ATTACK_OFFSET;
 
   // 4 bit one hot values for the multiplexer mode
   // 0001 is zero speed 
@@ -156,25 +119,26 @@ module Axis_Velocity(mode, stealth_speed, defense_speed, attack_speed, velocity)
   // 1000 is the stealth mode
   // The output of the mode multiplexer would be the velocity associated with that mode
   Mux4 velocity_mux(stealth_speed, defense_speed, attack_speed, 16'b0, mode, velocity);  // Add arbitary values for a1, a2 and a3
+
 endmodule
 
-module Velocity(mode, stealth_speed, defense_speed, attack_speed);
+module Velocity(mode, speed);
   parameter k = 16;
 
   input [3:0] mode;
-  input [3*k-1:0] stealth_speed, defense_speed, attack_speed;
+  input [3*k-1:0] speed;//in the form {XSPEED, YSPEED, ZSPEED}
   wire  [k-1:0] x, y, z;  
-  reg [k-1:0] x_velocity, y_velocity, z_velocity;  
+  reg [3*k-1:0] velocity;  
 
 
-  Axis_Velocity #(k) x_vel(mode, stealth_speed[k-1:0], defense_speed[k-1:0], attack_speed[k-1:0], x);
-  Axis_Velocity #(k) y_vel(mode, stealth_speed[2*k-1:k], defense_speed[2*k-1:k], attack_speed[2*k-1:k], y);
-  Axis_Velocity #(k) z_vel(mode, stealth_speed[3*k-1:2*k], defense_speed[3*k-1:2*k], attack_speed[3*k-1:2*k], z);
+  Axis_Velocity #(k) x_vel(mode, speed[`X], x);
+  Axis_Velocity #(k) y_vel(mode, speed[`Y], y);
+  Axis_Velocity #(k) z_vel(mode, speed[`Z], z);
   always @(*)
   begin
-    x_velocity = x;
-    y_velocity = y;
-    z_velocity = z;
+    velocity[`X] = x;
+    velocity[`Y] = y;
+    velocity[`Z] = z;
   end
 endmodule
 
@@ -183,22 +147,14 @@ module TestBench();
 
 
   reg clk;
-  reg [3:0] mode;
-  reg [3:0] pos_mode;
+  reg [3:0] mode;//one hot steath, defense, attack, no-op
+  reg [3:0] pos_mode;// undef, jump, sublight, reset
   
-  reg [3*k-1:0] jump_position;
-  
-  reg [3*k-1:0] stealth_speed = {16'b1,16'b1,16'b1};
-  reg [3*k-1:0] defense_speed = {16'b1,16'b1,16'b1};
-  reg [3*k-1:0] attack_speed  = {16'b1,16'b1,16'b1};
+  reg [3*k-1:0] jump_position;// in the form {X, Y, Z}
+  reg [3*k-1:0] speed;// in the form {X, Y, Z}
 
-  reg [k-1:0] x;
-  reg [k-1:0] y;
-  reg [k-1:0] z;
-
-  Velocity #(k) velocity(mode, stealth_speed, defense_speed, attack_speed);
-
-  Position #(k) position(clk, mode, pos_mode, jump_position, velocity.x_velocity, velocity.y_velocity, velocity.z_velocity);
+  Velocity #(k) velocity(mode, speed);
+  Position #(k) position(clk, mode, pos_mode, jump_position, velocity.velocity);
 
 	//---------------------------------------------
 	//The Display Thread with Clock Control
@@ -221,12 +177,12 @@ module TestBench();
 	initial
 		begin
 		#1 ///Offset the Square Wave
-		$display("CLK| x | y | z |");
-		$display("---+---+---+---+");
+		$display("CLK| pos x | pos y | pos z |");
+		$display("---+-------+-------+-------+");
 		forever
 			begin
 				#10
-				$display(" %b |%d|%d|%d|",clk, position.x, position.y, position.z);
+				$display(" %b |%d|%d|%d|",clk, position.position[`X], position.position[`Y], position.position[`Z]);
 			end
 	end	
 
@@ -235,11 +191,11 @@ module TestBench();
 	initial 
 		begin
 			#2 //Offset the Square Wave
-      #10 mode = 'b0001; pos_mode = 'b0001;
-      #10 mode = 'b0010; pos_mode = 'b0010;
+      #10 mode = `RESET; pos_mode = `RESET;
+      #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = 1; speed[`Y] = 1; speed[`Z] = 1;
 			#50
-      #10 mode = 'b0010; pos_mode = 'b0100; jump_position[`X] = 100; jump_position[`Y] = 100; jump_position[`Z] = 100;
-      #10 mode = 'b0010; pos_mode = 'b0010; attack_speed[`Y] = -20;
+      #10 mode = `ATTACK; pos_mode = `JUMP; jump_position[`X] = 100; jump_position[`Y] = 100; jump_position[`Z] = 100;
+      #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = 4; speed[`Y] = 4; speed[`Z] = 4;
 			#50
 			
 			$finish;
