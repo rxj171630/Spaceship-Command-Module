@@ -1,7 +1,7 @@
 //=============================================
 // Saturation Counter
 //=============================================
-module SaturationCounter(clk, rst, up, down, load, loadMax, in, out) ;
+module SaturationCounter(clk, rst, up, down, load, loadMax, in, out, rate) ;
   parameter n = 9 ;
 
 //---------------------------------------------
@@ -10,6 +10,7 @@ module SaturationCounter(clk, rst, up, down, load, loadMax, in, out) ;
   input clk, rst, up, down, load;
   input [1:0] loadMax;
   input [n-1:0] in ;
+  input [n-1:0] rate;
   output [n-1:0] out ;
 
 //---------------------------------------------
@@ -32,7 +33,7 @@ module SaturationCounter(clk, rst, up, down, load, loadMax, in, out) ;
 //---------------------------------------------
 
   assign outUp    = (max> out) ? out + {{n-1{down}},1'b1} : max;
-  assign outDown  = (0  < out) ? out + {{n-1{down}},1'b1} : 0;
+  assign outDown  = (0  < out) ? out - rate  : 0;
   assign outpm1   = ({down}>0)? {outDown} :{outUp};
 
 
@@ -104,19 +105,19 @@ endmodule
 //=================================================
 //Run Counter
 //=================================================
-module ammoCount(input clk, input [8:0]ammoIn, input fire);
-reg rst, up, down, load;
+module ammoCount(input clk, input [8:0]ammoIn, input fire, input [8:0]fireRate);
+reg rst, up, load;
 reg [1:0]loadMax;
 wire [8:0]ammoOut;
-SaturationCounter sat(clk, rst, up, down, load, loadMax, ammoIn, ammoOut);
+SaturationCounter sat(clk, rst, up, fire, load, loadMax, ammoIn, ammoOut, fireRate);
 
 
-  initial begin
-  forever begin
-  #12
-    down = fire;
-    end
-  end
+  // initial begin
+  // forever begin
+  // #12
+  //   down = fire;
+  //   end
+  // end
 
 //---------------------------------------------
 //The Display Thread with Clock Control
@@ -129,14 +130,14 @@ SaturationCounter sat(clk, rst, up, down, load, loadMax, ammoIn, ammoOut);
 	  forever
 			begin
 			#5
-			$display(" %1b | %1b | %1b |  %1b |  %1b |    %1b   |%5b [%d]",clk,rst,up,down,load,loadMax[1],ammoOut,ammoOut);
+			$display(" %1b | %1b | %1b |  %1b |  %1b |    %1b   |%5b [%d]",clk,rst,up,fire,load,loadMax[1],ammoOut,ammoOut);
 			end
    end
 
    //Initial values and delay for output
    initial
    	begin
-       up = 0; down = 0; load = 1; rst = 0; loadMax = 01;
+       up = 0; load = 1; rst = 0; loadMax = 01;
    	  #2 //Offset the Square Wave
        #5 load = 1; rst = 0;  $display("load into ammo reg");
        #5 load = 0;  $display("start firing");
@@ -145,11 +146,11 @@ SaturationCounter sat(clk, rst, up, down, load, loadMax, ammoIn, ammoOut);
    	end
 endmodule
 
-module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input fire, output error);
+module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input fire, input [8:0]fireRate, output error);
   wire mode;
   reg error;
   Mux4_1 selMode(1'b0, 1'b0, 1'b1, 1'b0, mode_selector, mode);  //0010 is attack mode
-  ammoCount run(clk, ammo, fire);
+  ammoCount run(clk, ammo, fire, fireRate);
 
   initial begin
   forever begin
@@ -158,6 +159,7 @@ module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input fire,
     $display("error: %b", error);
     end
   end
+
 endmodule
 
 module testBench();
@@ -165,15 +167,19 @@ module testBench();
   reg [3:0]mode_selector;
   reg [8:0]ammo;
   reg fire;
+  reg [8:0]fireRate;
   wire error;
-  weapons try(clk, mode_selector, ammo, fire, error);
+  weapons try(clk, mode_selector, ammo, fire, fireRate, error);
   //============================================
   //Set initial values
   //============================================
   initial begin
+  fire = 0;
   ammo = 500;
   mode_selector = 4'b0010;
+  #12
   fire = 1;
+  fireRate = 3;
   #200
   fire = 0; $display ("stop firing");
   #200;
