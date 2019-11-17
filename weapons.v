@@ -110,15 +110,6 @@ reg rst, up, load;
 reg [1:0]loadMax;
 wire [8:0]ammoOut;
 SaturationCounter sat(clk, rst, up, fire, load, loadMax, ammoIn, ammoOut, fireRate);
-
-
-  // initial begin
-  // forever begin
-  // #12
-  //   down = fire;
-  //   end
-  // end
-
 //---------------------------------------------
 //The Display Thread with Clock Control
 //---------------------------------------------
@@ -179,7 +170,7 @@ module testBench();
   mode_selector = 4'b0010;
   #12
   fire = 1;
-  fireRate = 3;
+  fireRate = 1;
   #200
   fire = 0; $display ("stop firing");
   #200;
