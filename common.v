@@ -4,13 +4,13 @@
 module DFF(clk,in,out);
 	parameter k = 16;
 
-  input  clk;
+    input  clk;
 	input  [k-1:0] in;
 	output [k-1:0] out;
 	reg    [k-1:0] out;
 
-  always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
-  out = in;
+    always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
+        out = in;
 endmodule
 
 
