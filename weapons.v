@@ -105,8 +105,8 @@ endmodule
 //=================================================
 //Run Counter
 //=================================================
-module ammoCount(input clk, input [8:0]ammoIn, input fire, input [8:0]fireRate);
-reg rst, up, load;
+module ammoCount(input clk, input [8:0]ammoIn, input load, input fire, input [8:0]fireRate);
+reg rst, up;
 reg [1:0]loadMax;
 wire [8:0]ammoOut;
 SaturationCounter sat(clk, rst, up, fire, load, loadMax, ammoIn, ammoOut, fireRate);
@@ -125,27 +125,29 @@ SaturationCounter sat(clk, rst, up, fire, load, loadMax, ammoIn, ammoOut, fireRa
 			end
    end
 
-   //Initial values and delay for output
+   //LOAD AMMO
    initial
    	begin
-       up = 0; load = 1; rst = 0; loadMax = 01;
+       up = 0; rst = 0; loadMax = 01;
    	  #2 //Offset the Square Wave
-       #5 load = 1; rst = 0;  $display("load into ammo reg");
-       #5 load = 0;  $display("start firing");
+       #5 rst = 0;
+       #5
        #300
    		$finish;
    	end
 endmodule
 
-module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input fire, input [8:0]fireRate, output error);
+module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input loadingAmmo, input fire, input [8:0]fireRate, output error);
   wire mode;
   reg error;
+  reg shoot;
   Mux4_1 selMode(1'b0, 1'b0, 1'b1, 1'b0, mode_selector, mode);  //0010 is attack mode
-  ammoCount run(clk, ammo, fire, fireRate);
+  ammoCount run(clk, ammo, loadingAmmo, shoot, fireRate);
 
   initial begin
   forever begin
   #5
+    shoot = fire & !loadingAmmo;
     error = ((fire & (!mode)) | (fire & (!ammo)));
     $display("error: %b", error);
     end
@@ -159,17 +161,29 @@ module testBench();
   reg [8:0]ammo;
   reg fire;
   reg [8:0]fireRate;
+  reg loadingAmmo;
   wire error;
-  weapons try(clk, mode_selector, ammo, fire, fireRate, error);
+  weapons try(clk, mode_selector, ammo, loadingAmmo, fire, fireRate, error);
   //============================================
   //Set initial values
   //============================================
   initial begin
-  fire = 0;
-  ammo = 500;
+  #11
+  fire = 0; //down
+  ammo = 500; //in
+  #10
+  loadingAmmo = 1;    $display("load into ammo reg"); //load
   mode_selector = 4'b0010;
-  #12
-  fire = 1;
+  #10
+  loadingAmmo = 0;  $display("done loading ammo"); //load
+  fireRate = 5;
+  fire = 1; $display("start firing");
+  #100
+  loadingAmmo = 1; $display("Start loading");
+  #10
+  ammo = 200; $display("load ammo");
+  #10
+  loadingAmmo = 0;  $display("done loading");
   fireRate = 1;
   #200
   fire = 0; $display ("stop firing");
