@@ -9,10 +9,10 @@ P MODE - 4 bit one hot, 0001 - reset positon, 0010 - NORMAL SUBLIGHT, 0100 - JUM
 
 
 # CURRENT OPERATIONS
-Set MODE
-Set P MODE
-Set JUMP DESTINATION
-Set Speed
+Set MODE  
+Set P MODE  
+Set JUMP DESTINATION  
+Set Speed  
 
 Add Ammo
 Can Fire
