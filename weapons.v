@@ -125,15 +125,10 @@ SaturationCounter sat(clk, rst, up, fire, load, loadMax, ammoIn, ammoOut, fireRa
 			end
    end
 
-   //LOAD AMMO
+   //initial values
    initial
    	begin
        up = 0; rst = 0; loadMax = 01;
-   	  #2 //Offset the Square Wave
-       #5 rst = 0;
-       #5
-       #300
-   		$finish;
    	end
 endmodule
 
@@ -142,13 +137,13 @@ module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input loadi
   reg error;
   reg shoot;
   Mux4_1 selMode(1'b0, 1'b0, 1'b1, 1'b0, mode_selector, mode);  //0010 is attack mode
-  ammoCount run(clk, ammo, loadingAmmo, shoot, fireRate);
+  ammoCount run(clk, ammo, loadingAmmo, shoot, fireRate);   //run the counter
 
   initial begin
   forever begin
   #5
-    shoot = fire & !loadingAmmo;
-    error = ((fire & (!mode)) | (fire & (!ammo)));
+    shoot = fire & !loadingAmmo;    //You can't shoot while you are reloading
+    error = ((fire & (!mode)) | (fire & (!ammo)));  //Trying to shoot with no ammo or in the wrong mode is an error
     $display("error: %b", error);
     end
   end
@@ -173,21 +168,22 @@ module testBench();
   ammo = 500; //in
   #10
   loadingAmmo = 1;    $display("load into ammo reg"); //load
-  mode_selector = 4'b0010;
+  mode_selector = 4'b0010;  //set mode to attack
   #10
   loadingAmmo = 0;  $display("done loading ammo"); //load
-  fireRate = 5;
+  fireRate = 5; //5 rounds per clock
   fire = 1; $display("start firing");
   #100
-  loadingAmmo = 1; $display("Start loading");
+  loadingAmmo = 1; $display("Start loading"); //load
   #10
-  ammo = 200; $display("load ammo");
+  ammo = 200; $display("load ammo"); //in
   #10
-  loadingAmmo = 0;  $display("done loading");
-  fireRate = 1;
+  loadingAmmo = 0;  $display("done loading"); //load
+  fireRate = 1; //1 round per clock
   #200
-  fire = 0; $display ("stop firing");
+  fire = 0; $display ("stop firing"); //down
   #200;
+  $finish;
   end
   //---------------------------------------------
   //The Display Thread with Clock Control
