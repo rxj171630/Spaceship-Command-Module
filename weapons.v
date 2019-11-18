@@ -1,9 +1,10 @@
+`include "common.v"
 //=============================================Saturation Counter=============================================
 
 //=============================================
 // Saturation Counter
 //=============================================
-module SaturationCounter(clk, rst, up, down, load, loadMax, in, out, rate) ;
+module AmmoCounter(clk, rst, up, down, load, loadMax, in, out, rate) ;
   parameter n = 9 ;
 
 //---------------------------------------------
@@ -45,49 +46,8 @@ module SaturationCounter(clk, rst, up, down, load, loadMax, in, out, rate) ;
 
 endmodule
 
-//=============================================
-// D Flip-Flop
-//=============================================
-module DFF(clk,in,out);
-
-  input  clk;
-  input  [8:0]in;
-  output [8:0]out;
-  reg    out;
-
-  always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
-  out = in;
- endmodule
 
 
- //=============================================
-// 4-Channel, 4-Bit Multiplexer
-//=============================================
-
-module Mux4(a3, a2, a1, a0, s, b) ;
-	parameter k = 4 ;//Four Bits Wide
-	input [k-1:0] a3, a2, a1, a0 ;  // inputs
-	input [3:0]   s ; // one-hot select
-	output[k-1:0] b ;
-	assign b = ({k{s[3]}} & a3) |
-               ({k{s[2]}} & a2) |
-               ({k{s[1]}} & a1) |
-               ({k{s[0]}} & a0) ;
-endmodule
-
-
- //=============================================
-// 2-Channel, 4-Bit Multiplexer
-//=============================================
-
-module Mux2(a1, a0, s, b) ;
-	parameter k = 4 ;//Four Bits Wide
-	input [k-1:0] a3, a2, a1, a0 ;  // inputs
-	input [1:0]   s ; // one-hot select
-	output[k-1:0] b ;
-	assign b = ({k{s[1]}} & a1) |
-             ({k{s[0]}} & a0) ;
-endmodule
 
 //============================================================================================================
 
@@ -114,7 +74,7 @@ module ammoCount(input clk, input [8:0]ammoIn, input load, input fire, input [8:
 reg rst, up;
 reg [1:0]loadMax;
 wire [8:0]ammoOut;
-SaturationCounter sat(clk, rst, up, fire, load, loadMax, ammoIn, ammoOut, fireRate);
+AmmoCounter sat(clk, rst, up, fire, load, loadMax, ammoIn, ammoOut, fireRate);
 //---------------------------------------------
 //The Display Thread with Clock Control
 //---------------------------------------------
