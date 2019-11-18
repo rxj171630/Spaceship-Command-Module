@@ -49,24 +49,6 @@ endmodule
 
 
 
-//============================================================================================================
-
-//========================================================
-// 4-Channel, 1-Bit Multiplexer, used for determining mode
-//========================================================
-
-module Mux4_1(a3, a2, a1, a0, s, b) ;
- parameter k = 1 ;//1 Bit Wide
- input [k-1:0] a3, a2, a1, a0 ;  // inputs
- input [3:0]   s ; // one-hot select
- output[k-1:0] b ;
- assign b = ({k{s[3]}} & a3) |
-              ({k{s[2]}} & a2) |
-              ({k{s[1]}} & a1) |
-              ({k{s[0]}} & a0) ;
-endmodule
-
-
 //=================================================
 //Run Counter
 //=================================================
@@ -101,7 +83,7 @@ module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input loadi
   wire mode;
   reg error;
   reg shoot;
-  Mux4_1 selMode(1'b0, 1'b0, 1'b1, 1'b0, mode_selector, mode);  //0010 is attack mode
+  Mux4 #(1) selMode(1'b0, 1'b0, 1'b1, 1'b0, mode_selector, mode);  //0010 is attack mode
   ammoCount run(clk, ammo, loadingAmmo, shoot, fireRate);   //run the counter
 
   initial begin
