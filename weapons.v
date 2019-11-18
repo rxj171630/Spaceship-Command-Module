@@ -1,7 +1,10 @@
+`include "common.v"
+//=============================================Saturation Counter=============================================
+
 //=============================================
 // Saturation Counter
 //=============================================
-module SaturationCounter(clk, rst, up, down, load, loadMax, in, out, rate) ;
+module AmmoCounter(clk, rst, up, down, load, loadMax, in, out, rate) ;
   parameter n = 9 ;
 
 //---------------------------------------------
@@ -43,48 +46,8 @@ module SaturationCounter(clk, rst, up, down, load, loadMax, in, out, rate) ;
 
 endmodule
 
-//=============================================
-// D Flip-Flop
-//=============================================
-module DFF(clk,in,out);
-
-  input  clk;
-  input  [8:0]in;
-  output [8:0]out;
-  reg    out;
-
-  always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
-  out = in;
- endmodule
 
 
- //=============================================
-// 4-Channel, 4-Bit Multiplexer
-//=============================================
-
-module Mux4(a3, a2, a1, a0, s, b) ;
-	parameter k = 4 ;//Four Bits Wide
-	input [k-1:0] a3, a2, a1, a0 ;  // inputs
-	input [3:0]   s ; // one-hot select
-	output[k-1:0] b ;
-	assign b = ({k{s[3]}} & a3) |
-               ({k{s[2]}} & a2) |
-               ({k{s[1]}} & a1) |
-               ({k{s[0]}} & a0) ;
-endmodule
-
- //=============================================
-// 2-Channel, 3-Bit Multiplexer
-//=============================================
-
-module Mux2(a1, a0, s, b) ;
-	parameter k = 4 ;//Four Bits Wide
-	input [k-1:0] a3, a2, a1, a0 ;  // inputs
-	input [1:0]   s ; // one-hot select
-	output[k-1:0] b ;
-	assign b = ({k{s[1]}} & a1) |
-             ({k{s[0]}} & a0) ;
-endmodule
 
 //=================================================
 //Run Counter
@@ -93,7 +56,7 @@ module ammoCount(input clk, input [8:0]ammoIn, input load, input fire, input [8:
 reg rst, up;
 reg [1:0]loadMax;
 wire [8:0]ammoOut;
-SaturationCounter sat(clk, rst, up, fire, load, loadMax, ammoIn, ammoOut, fireRate);
+AmmoCounter sat(clk, rst, up, fire, load, loadMax, ammoIn, ammoOut, fireRate);
 //---------------------------------------------
 //The Display Thread with Clock Control
 //---------------------------------------------
@@ -120,7 +83,7 @@ module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input loadi
   wire mode;
   reg error;
   reg shoot;
-  Mux4 #(1) modeSel(1'b0, 1'b0, 1'b1, 1'b0, mode_selector, mode); //0010 is the attack mode
+  Mux4 #(1) selMode(1'b0, 1'b0, 1'b1, 1'b0, mode_selector, mode);  //0010 is attack mode
   ammoCount run(clk, ammo, loadingAmmo, shoot, fireRate);   //run the counter
 
   initial begin
@@ -172,13 +135,12 @@ module testBench();
   //---------------------------------------------
   //The Display Thread with Clock Control
   //---------------------------------------------
-    initial begin
-  	  forever
-  			begin
-  					#5
-  					clk = 0 ;
-  					#5
-  					clk = 1 ;
-  			end
+  initial begin
+  forever begin
+      #5
+      clk = 0 ;
+      #5
+      clk = 1 ;
+      end
     end
 endmodule
