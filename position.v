@@ -68,14 +68,14 @@ module Axis_Position (clk, pos_mode, jump_position, velocity);
   wire [k-1:0] adder_out;
   
   // The adder would ouput the next position in the normal case
-  Adder add(position, velocity, adder_out);
+  Adder #(k) add(position, velocity, adder_out);
 
   // 4 bit one hot values for the multiplexer position
   // 0001 is the reset 
   // 0010 is the sublight which is the sum of the current position and velocity
   // 0100 is the jump mode
-  // 1000 is a do nothing
-  Mux4 position_mux(position, jump_position, adder_out, {k{1'b0}}, pos_mode, next_position);  // Set the warp speed to an arbitary large value // teleportation pretty much
+  // 1000 is a do nothing SHOULDNT EVER HAPPEN USE ZERO VELOCITY INSTEAD
+  Mux4 #(k) position_mux(position, jump_position, adder_out, {k{1'b0}}, pos_mode, next_position);  // Set the warp speed to an arbitary large value // teleportation pretty much
 
   // Its gonna take the output of the position multiplexer
   DFF #(k) Q(clk, next_position, position);
@@ -131,7 +131,7 @@ module Axis_Velocity(mode, speed);
   // 0100 is the defense mode
   // 1000 is the stealth mode
   // The output of the mode multiplexer would be the velocity associated with that mode
-  Mux4 velocity_mux(stealth_speed, defense_speed, attack_speed, 16'b0, mode, velocity);  // Add arbitary values for a1, a2 and a3
+  Mux4 #(k) velocity_mux(stealth_speed, defense_speed, attack_speed, {k{1'b0}}, mode, velocity);  // Add arbitary values for a1, a2 and a3
 
 endmodule
 
@@ -155,7 +155,7 @@ module Velocity(mode, speed);
 endmodule
 
 module TestBench();
-  parameter k = 16;
+  parameter k = 32;
 
 
   reg clk;
@@ -166,7 +166,7 @@ module TestBench();
   reg [3*k-1:0] speed;// in the form {X, Y, Z}
   
   Velocity #(k) velocity(mode, speed);
-  Position #(k) position(clk, mode, pos_mode, jump_position, {velocity.x, velocity.y, velocity.z});
+  Position #(k) position(clk, mode, pos_mode, jump_position, {velocity.z, velocity.y, velocity.x});
 
 	//---------------------------------------------
 	//The Display Thread with Clock Control
@@ -189,12 +189,17 @@ module TestBench();
 	initial
 		begin
 		#1 ///Offset the Square Wave
-		$display("CLK| pos x | pos y | pos z |");
-		$display("---+-------+-------+-------+");
+    $display("CLK - The clock signal");
+    $display("MODE - 4 bit one hot, 0001 - OFF, 0010 - ATTACK, 0100 - DEFENSE, 1000 - STEALTH");
+    $display("P MODE - 4 bit one hot, 0001 - reset positon, 0010 - NORMAL SUBLIGHT, 0100 - JUMP DRIVE, 1000 - NO CHANGE");
+    $display("VELOCITY IS IN UNITS/CLOCK TICK");
+    $display("");
+		$display("CLK| MODE |P MODE| pos x | pos y | pos z | vel x | vel y | vel z |");
+		$display("---+------+------+-------+-------+-------+-------+-------+-------+");
 		forever
 			begin
 				#10
-				$display(" %b |%d|%d|%d|",clk, position.x, position.y, position.z);
+				$display(" %b | %b | %b | %d | %d | %d | %d | %d | %d |",clk, mode, pos_mode, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z);
 			end
 	end	
 
@@ -207,8 +212,8 @@ module TestBench();
       #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = 1; speed[`Y] = 1; speed[`Z] = 1;
 			#50
       #10 mode = `ATTACK; pos_mode = `JUMP;   jump_position[`X] = 100; jump_position[`Y] = 100; jump_position[`Z] = 100;
-      #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = 4; speed[`Y] = 4; speed[`Z] = 4;
-			#50
+      #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = -4; speed[`Y] = 4; speed[`Z] = 4;
+			#100
 			
 			$finish;
 		end
