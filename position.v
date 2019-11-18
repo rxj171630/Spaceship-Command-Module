@@ -201,6 +201,7 @@ module TestBench();
 				#10
 				$display(" %b | %b | %b | %d | %d | %d | %d | %d | %d |",clk, mode, pos_mode, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z);
 			end
+    $display("FIXME NEGATIVE NUMBERS!!!!!!!!!!!!!!!!!");
 	end	
 
 
