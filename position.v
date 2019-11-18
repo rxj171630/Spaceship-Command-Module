@@ -110,9 +110,9 @@ endmodule
 module Axis_Velocity(mode, speed);
   parameter k = 16;
   
-  `define STEALTH_OFFSET 3
-  `define DEFENSE_OFFSET 2
-  `define ATTACK_OFFSET 1
+  `define STEALTH_OFFSET 2'b11
+  `define DEFENSE_OFFSET 2'b10
+  `define ATTACK_OFFSET 2'b01
 
 
   input [3:0] mode;
@@ -120,10 +120,7 @@ module Axis_Velocity(mode, speed);
   wire [k-1:0] velocity;//adjusted speed
 
   //Takes speed and applies offset based on mode
-  wire [k-1:0] stealth_speed, defense_speed, attack_speed;
-  assign stealth_speed = speed / `STEALTH_OFFSET;
-  assign defense_speed = speed / `DEFENSE_OFFSET;
-  assign attack_speed = speed / `ATTACK_OFFSET;
+  wire [1:0] offset;
 
   // 4 bit one hot values for the multiplexer mode
   // 0001 is zero speed 
@@ -131,7 +128,11 @@ module Axis_Velocity(mode, speed);
   // 0100 is the defense mode
   // 1000 is the stealth mode
   // The output of the mode multiplexer would be the velocity associated with that mode
-  Mux4 #(k) velocity_mux(stealth_speed, defense_speed, attack_speed, {k{1'b0}}, mode, velocity);  // Add arbitary values for a1, a2 and a3
+  Mux4 #(2) velocity_mux(`STEALTH_OFFSET, `DEFENSE_OFFSET, `ATTACK_OFFSET, 2'b00, mode, offset);
+
+  assign velocity = speed / offset;
+
+
 
 endmodule
 
@@ -152,72 +153,4 @@ module Velocity(mode, speed);
     y = y_vel.velocity;
     z = z_vel.velocity;
   end
-endmodule
-
-module TestBench();
-  parameter k = 32;
-
-
-  reg clk;
-  reg [3:0] mode;//one hot steath, defense, attack, no-op
-  reg [3:0] pos_mode;// undef, jump, sublight, reset
-  
-  reg [3*k-1:0] jump_position;// in the form {X, Y, Z}
-  reg [3*k-1:0] speed;// in the form {X, Y, Z}
-  
-  Velocity #(k) velocity(mode, speed);
-  Position #(k) position(clk, mode, pos_mode, jump_position, {velocity.z, velocity.y, velocity.x});
-
-	//---------------------------------------------
-	//The Display Thread with Clock Control
-	//---------------------------------------------
-	initial
-		begin
-		forever
-			begin
-				#5 
-				clk = 0;
-				#5
-				clk = 1;
-			end
-	end	
-
-
-  	//---------------------------------------------
-	//The Display Thread with Clock Control
-	//---------------------------------------------
-	initial
-		begin
-		#1 ///Offset the Square Wave
-    $display("CLK - The clock signal");
-    $display("MODE - 4 bit one hot, 0001 - OFF, 0010 - ATTACK, 0100 - DEFENSE, 1000 - STEALTH");
-    $display("P MODE - 4 bit one hot, 0001 - reset positon, 0010 - NORMAL SUBLIGHT, 0100 - JUMP DRIVE, 1000 - NO CHANGE");
-    $display("VELOCITY IS IN UNITS/CLOCK TICK");
-    $display("");
-		$display("CLK| MODE |P MODE| pos x | pos y | pos z | vel x | vel y | vel z |");
-		$display("---+------+------+-------+-------+-------+-------+-------+-------+");
-		forever
-			begin
-				#10
-				$display(" %b | %b | %b | %d | %d | %d | %d | %d | %d |",clk, mode, pos_mode, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z);
-			end
-    $display("FIXME NEGATIVE NUMBERS!!!!!!!!!!!!!!!!!");
-	end	
-
-
-
-	initial 
-		begin
-			#2 //Offset the Square Wave
-      #10 mode = `RESET;  pos_mode = `RESET;
-      #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = 1; speed[`Y] = 1; speed[`Z] = 1;
-			#50
-      #10 mode = `ATTACK; pos_mode = `JUMP;   jump_position[`X] = 100; jump_position[`Y] = 100; jump_position[`Z] = 100;
-      #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = -4; speed[`Y] = 4; speed[`Z] = 4;
-			#100
-			
-			$finish;
-		end
-
-
 endmodule
