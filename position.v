@@ -1,5 +1,3 @@
-`include "common.v"
-
 `define X k-1:0
 `define Y 2*k-1:k
 `define Z 3*k-1:2*k
