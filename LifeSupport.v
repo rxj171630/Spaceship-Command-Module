@@ -1,52 +1,5 @@
-//
-//Decoder
-//
-module Dec(a,b);
-	input a;
-	output [1:0] b;
-	assign b=1<<a;
-endmodule
-///
-///DFF
-///
-module DFF(clk,in,out);
-  parameter n=5;
-  input  clk;
-  input [n-1:0] in;
-  output [n-1:0] out;
-  reg  [n-1:0]  out;
-  
-  always @(posedge clk)//<--This is the statement that makes the circuit behave with TIME
-  out = in;
- endmodule
-//
-//Mux2
-//
-module Mux2(a1, a0, s, b);
-	parameter k=5;
-	input [k-1:0] a1, a0;
-	input [2-1:0] s;
-	output [k-1:0] b;
-		assign b=({k{s[1]}} &a1)|
-				 ({k{s[0]}} & a0);
-endmodule
-//
-//Mux4
-//
-module Mux4(a3, a2, a1, a0, s, b) ;
-	parameter k = 1 ;//Three Bits Wide
-	input [k-1:0] a3, a2, a1, a0 ;  // inputs
-	input [3:0]   s ; // one-hot select
-	output[k-1:0] b ;
-	assign b = ({k{s[3]}} & a3) | 
-               ({k{s[2]}} & a2) | 
-               ({k{s[1]}} & a1) |
-               ({k{s[0]}} & a0) ;
-endmodule
-//=============================================
-// Saturation Counter
-//=============================================
-module SaturationCounter(clk, rst,pwr,shield, chrg,atk, o2, o2sup, mode, temp, outshield, outtemp, outpower, outo2, fatal) ;
+
+module LifeSupport(clk, rst,pwr,shield, chrg,atk, o2, o2sup, mode, temp, outshield, outtemp, outpower, outo2, fatal) ;
   parameter n = 8 ;
   
 //---------------------------------------------
@@ -73,7 +26,7 @@ module SaturationCounter(clk, rst,pwr,shield, chrg,atk, o2, o2sup, mode, temp, o
 //--------------------------------------------- 
   
   assign outShield    =((def===1)||(outshield<=100)) ? outshield + 1 : outshield-1;
-  assign outDmg 	= (atk===1)? outshield - 1: outshield;
+  assign outDmg 	= (atk===1)? outshield - 5: outshield;
   assign outTemp  = ((temp  > outtemp)||(sth===1)) ? outtemp + 1 :outtemp - 1;
   assign outPower = (chrg===1) ? outpower: outpower-1;
   assign outO2 = ((o2sup===1)||(outo2===0)) ? outo2: outo2-1;
@@ -139,13 +92,12 @@ endmodule
 //============================================= // Test Bench //=============================================
  module Test_Fsm1 ; 
 parameter n = 8 ; 
-reg clk, rst, chrg, o2sup,atk;
+reg clk, 	
 reg	 [3:0] mode ; 
-reg [n-1:0] shield, temp, pwr, o2; 
-wire [n-1:0]out; 
+reg [n-1:0] shield, temp, pwr, o2;  
 wire fatal;
 wire [n-1:0] outshield, outtemp, outpower, outo2 ; 
-SaturationCounter ls(clk, rst,pwr,shield, chrg,atk, o2, o2sup, mode, temp, outshield, outtemp, outpower, outo2, fatal); // clock with period of 10 units
+LifeSupport ls(clk, rst,pwr,shield, chrg,atk, o2, o2sup, mode, temp, outshield, outtemp, outpower, outo2, fatal); // clock with period of 10 units
  initial 
  begin 
 	 $display("CLK|RST|UP|DN|LD|LDMAX|IN|MAX|OUT");
@@ -170,10 +122,10 @@ end
 initial 
 begin 
 #10 
-#10 pwr=7'b1111111; chrg=1;mode=4'b0100; rst=1; temp=7'b100010; shield=7'b1000100; o2=7'b001000; o2sup=1; atk=0;
-#10 chrg=0; rst=0; o2sup=0; atk=1;
+#10 pwr=7'b1111111; chrg=1;mode=4'b0100; rst=1; temp=7'b100010; shield=7'b1100100; o2=7'b001000; o2sup=1; atk=0;
+#10 chrg=0; rst=0; o2sup=0; atk=0;
 #10 
-#120 atk=0;
+#120 atk=1;
 #10  mode=4'b0010;chrg=1;
 #10 chrg=0;
 #160 //appropriate time to count down
