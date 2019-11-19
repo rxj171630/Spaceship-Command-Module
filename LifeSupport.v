@@ -25,12 +25,12 @@ module LifeSupport(clk, rst,pwr,shield, chrg,atk, o2, o2sup, mode, temp, outshie
 // Main Counter Control
 //--------------------------------------------- 
   
-  assign outShield    =((def===1)||(outshield<=100)) ? outshield + 1 : outshield-1;
-  assign outDmg 	= (atk===1)? outshield - 5: outshield;
-  assign outTemp  = ((temp  > outtemp)||(sth===1)) ? outtemp + 1 :outtemp - 1;
-  assign outPower = (chrg===1) ? outpower: outpower-1;
-  assign outO2 = ((o2sup===1)||(outo2===0)) ? outo2: outo2-1;
-  assign fatal=((outtemp<100)&&(outo2!=0))? 0: 1;
+  assign outShield    	=((def===1)||(outshield<=100)) ? outshield + 1 : outshield-1;
+  assign outDmg 		= (atk===1)? outshield - 5: outshield;
+  assign outTemp  		= ((temp  > outtemp)||(sth===1)) ? outtemp + 1 :outtemp - 1;
+  assign outPower 		= (chrg===1) ? outpower: outpower-1;
+  assign outO2 			= ((o2sup===1)||(outo2===0)) ? outo2: outo2-1;
+  assign fatal			=((outtemp<100)&&(outo2!=0))? 0: 1;
   
   
  
