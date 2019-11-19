@@ -1,6 +1,6 @@
 
 module LifeSupport(clk, rst,pwr,shield, chrg,atk, o2, o2sup, mode, temp, outshield, outtemp, outpower, outo2, fatal) ;
-  parameter n = 8 ;
+  parameter n = 32 ;
   
 //---------------------------------------------
 // Parameters
