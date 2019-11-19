@@ -13,10 +13,10 @@ module LifeSupport(clk, rst,pwr,shield, chrg,atk, o2, o2sup, mode, temp, outshie
 //---------------------------------------------
 // Local Variables
 //---------------------------------------------  
-  wire [n-1:0] nextTe, nextSh, nextPwr, nextO2, outShield,outTemp, outPower,outDmg, outO2,dmg;
+  wire [n-1:0] nextTe, nextSh, nextPwr, nextO2, outShield,outTemp, outPower,outDmg, outO2;
   
   wire on, def, sth	;
-  assign dmg = 3'b101;
+  
   assign def = (((~mode[3]&mode[2]&~mode[1]&~mode[0])===1)&(outpower>0))? 1: 0; 
   assign sth = (((mode[3]&~mode[2]&~mode[1]&~mode[0])===1)&(outpower>0))? 1: 0;
   
