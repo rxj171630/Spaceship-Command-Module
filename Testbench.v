@@ -24,8 +24,12 @@ module TestBench();
     wire error;
     weapons try(clk, mode, ammo, loadingAmmo, fire, fireRate, error);
 
+    reg rst, chrg, o2sup,atk;
+    reg [k-1:0] shield, temp, pwr, o2; 
+    wire fatal;
+    wire [k-1:0] outshield, outtemp, outpower, outo2 ; 
 
-
+    LifeSupport ls(clk, rst,pwr,shield, chrg,atk, o2, o2sup, mode, temp, outshield, outtemp, outpower, outo2, fatal);
 	//---------------------------------------------
 	//The Display Thread with Clock Control
 	//---------------------------------------------
@@ -75,8 +79,8 @@ module TestBench();
 	initial
 		begin
 			#2 //Offset the Square Wave
-            #10 mode = `RESET;  pos_mode = `RESET; fire = 0; ammo = 500; loadingAmmo = 1;
-            #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = 1; speed[`Y] = 1; speed[`Z] = 1; loadingAmmo = 0; fireRate = 2; fire = 1;
+            #10 mode = `RESET;  pos_mode = `RESET; fire = 0; ammo = 500; loadingAmmo = 1; pwr=7'b1111111; temp=7'b100010; shield=7'b1100100; o2=7'b1100100; o2sup=1; atk=0; chrg=1; rst=1;
+            #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = 1; speed[`Y] = 1; speed[`Z] = 1; loadingAmmo = 0; fireRate = 2; fire = 1; chrg=0; rst=0; o2sup=0;
 			#50
             #10 mode = `ATTACK; pos_mode = `JUMP;   jump_position[`X] = 100; jump_position[`Y] = 100; jump_position[`Z] = 100; loadingAmmo = 1; ammo = 200;
             #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = 4; speed[`Y] = 4; speed[`Z] = 4; loadingAmmo = 0; fireRate = 1;
