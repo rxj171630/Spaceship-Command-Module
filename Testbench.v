@@ -51,13 +51,19 @@ module TestBench();
         $display("MODE - 4 bit one hot, 0001 - OFF, 0010 - ATTACK, 0100 - DEFENSE, 1000 - STEALTH");
         $display("P MODE - 4 bit one hot, 0001 - reset positon, 0010 - NORMAL SUBLIGHT, 0100 - JUMP DRIVE, 1000 - NO CHANGE");
         $display("VELOCITY is in units/clock-tick");
+        $display("FIRING - 1 bit - Are the weapons being fired?");
+        $display("RELOAD - 1 bit - Are we reloading the ammo? Automatically stops firing when reloading");
+        $display("AMMO COUNT - 9-bit - How much ammo is loaded? Max capacity is 511 rounds");
+        $display("FIRE RATE - 9-bit - How many rounds per clock-tick are being fired?");
         $display("");
-		$display("CLK| MODE |P MODE| POS X | POS Y | POS Z | VEL X | VEL Y | VEL Z | FIREING | LOADING | AMMO COUNT | FIRE RATE | ERROR |");
-		$display("---+------+------+-------+-------+-------+-------+-------+-------+---------+---------+------------+-----------+-------+");
+    $display("    |                     Positioning Systems                     ||                  Weapons Systems                 |");
+    $display("---||-------------------------------------------------------------||--------------------------------------------------|");
+    $display("CLK|| MODE |P MODE| POS X | POS Y | POS Z | VEL X | VEL Y | VEL Z || FIRING | RELOAD | AMMO COUNT | FIRE RATE | ERROR |");
+		$display("---++------+------+-------+-------+-------+-------+-------+-------++--------+--------+------------+-----------+-------+");
 		forever
 			begin
 				#10
-				$display(" %b | %b | %b | %d | %d | %d | %d | %d | %d | %d | %d | %d | %d | %b |",clk, mode, pos_mode, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, fire, loadingAmmo, try.newAmmo, fireRate, error);
+				$display(" %b || %b | %b | %5d | %5d | %5d | %5d | %5d | %5d ||    %d   |    %d   |     %d    |    %d    |   %b   |",clk, mode, pos_mode, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, fire, loadingAmmo, try.newAmmo, fireRate, error);
 			end
         $display("FIXME NEGATIVE NUMBERS!!!!!!!!!!!!!!!!!");
 
