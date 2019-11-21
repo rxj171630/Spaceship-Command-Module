@@ -14,9 +14,9 @@ Set P MODE
 Set JUMP DESTINATION  
 Set Speed  
 
-Add Ammo  
-Can Fire  
-Rate of fire  
+Fire weapons  
+Reload  
+Set fire rate  
 
 (Allowing the ship to be attacked)  
 (Allowing the user to resupply oxygen)  
