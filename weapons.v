@@ -76,7 +76,7 @@ module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input loadi
   #5
     newAmmo = run.ammoOut;
     shoot = fire & !loadingAmmo;    //You can't shoot while you are reloading
-    error = ((fire & (!mode)) | (fire & (!ammo)));  //Trying to shoot with no ammo or in the wrong mode is an error
+    error = ((fire & (!mode)) | (mode & fire & (!ammo)));  //Trying to shoot in the wrong mode is an error. Trying to shoot with no ammo in the right mode is an error.
     end
   end
 
