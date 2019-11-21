@@ -25,9 +25,9 @@ module TestBench();
     weapons try(clk, mode, ammo, loadingAmmo, fire, fireRate, error);
 
     reg rst, chrg, o2sup,atk;
-    reg [k-1:0] shield, temp, pwr, o2; 
+    reg [k-1:0] shield, temp, pwr, o2;
     wire fatal;
-    wire [k-1:0] outshield, outtemp, outpower, outo2 ; 
+    wire [k-1:0] outshield, outtemp, outpower, outo2 ;
 
     LifeSupport ls(clk, rst,pwr,shield, chrg,atk, o2, o2sup, mode, temp, outshield, outtemp, outpower, outo2, fatal);
 	//---------------------------------------------
@@ -64,14 +64,14 @@ module TestBench();
 		$display("OXYGEN - 32-bit - How much oxygen do we have left?");
 		$display("FATAL ERROR - 32-bit - Is the crew dead if the temperature reaches above 100 or runs out of oxygen?");
         $display("");
-    $display("    |                     Positioning Systems                     ||                  Weapons Systems                 ||                Life Support                  |");
-    $display("---||-------------------------------------------------------------||--------------------------------------------------||----------------------------------------------|");
-    $display("CLK|| MODE |P MODE| POS X | POS Y | POS Z | VEL X | VEL Y | VEL Z || FIRING | RELOAD | AMMO COUNT | FIRE RATE | ERROR || POWER | TEMP | SHIELD | OXYGEN | FATAL ERROR |");
-	$display("---++------+------+-------+-------+-------+-------+-------+-------++--------+--------+------------+-----------+-------++--------+--------+------------+---------------+");
+    $display("  Global  ||              Positioning Systems                     ||                  Weapons Systems                 ||                Life Support                  |");
+    $display("----------||------------------------------------------------------||--------------------------------------------------||----------------------------------------------|");
+    $display("CLK| MODE ||P MODE| POS X | POS Y | POS Z | VEL X | VEL Y | VEL Z || FIRING | RELOAD | AMMO COUNT | FIRE RATE | ERROR || POWER | TEMP | SHIELD | OXYGEN | FATAL ERROR |");
+	$display("---+------++------+-------+-------+-------+-------+-------+-------++--------+--------+------------+-----------+-------++-------+------+--------+--------+-------------+");
 		forever
 			begin
 				#10
-				$display(" %b || %b | %b | %5d | %5d | %5d | %5d | %5d | %5d ||    %d   |    %d   |     %d    |    %d    |   %b   ||%7d|%6d|%8d|%8d|%13b|",clk, mode, pos_mode, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, fire, loadingAmmo, try.newAmmo, fireRate, error,outpower, outtemp, outshield, outo2, fatal);
+				$display(" %b | %b || %b | %5d | %5d | %5d | %5d | %5d | %5d ||    %d   |    %d   |     %d    |    %d    |   %b   ||%7d|%6d|%8d|%8d|%13b|",clk, mode, pos_mode, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, fire, loadingAmmo, try.newAmmo, fireRate, error,outpower, outtemp, outshield, outo2, fatal);
 			end
         $display("FIXME NEGATIVE NUMBERS!!!!!!!!!!!!!!!!!");
 
@@ -92,7 +92,7 @@ module TestBench();
             #10 fire = 0;
             #20	atk=1;
 			#400 mode= `STEALTH;
-			#400 
+			#400
 			#300
 			$finish;
 		end
