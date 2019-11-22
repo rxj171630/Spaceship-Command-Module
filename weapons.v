@@ -1,5 +1,5 @@
 //=============================================Saturation Counter=============================================
-
+//`include "common.v"
 //=============================================
 // Saturation Counter
 //=============================================
@@ -46,32 +46,21 @@ module AmmoCounter(clk, rst, up, down, load, loadMax, in, out, rate) ;
 endmodule
 
 
-
-
-//=================================================
-//Run Counter
-//=================================================
-module ammoCount(input clk, input [8:0]ammoIn, input load, input fire, input [8:0]fireRate, output [8:0]ammoOut);
-  reg rst, up;
-  reg [1:0]loadMax;
-  wire [8:0]ammoOut;
-  AmmoCounter sat(clk, rst, up, fire, load, loadMax, ammoIn, ammoOut, fireRate);
-   //initial values
-  initial
-   	begin
-       up = 0; rst = 0; loadMax = 01;
-   	end
-endmodule
-
 module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input loadingAmmo, input fire, input [8:0]fireRate, output [8:0]newAmmo, output error);
   wire mode;
   reg error;
   reg shoot;
   wire newAmmo;
   Mux4 #(1) selMode(1'b0, 1'b0, 1'b1, 1'b0, mode_selector, mode);  //0010 is attack mode
-  ammoCount run(clk, ammo, loadingAmmo, shoot, fireRate, newAmmo);   //run the counter
+  //ammoCount run(clk, ammo, loadingAmmo, shoot, fireRate, newAmmo);   //run the counter
+  reg rst, up;
+  reg [1:0]loadMax;
+  wire [8:0]ammoOut;
+  AmmoCounter sat(clk, rst, up, shoot, loadingAmmo, loadMax, ammo, newAmmo, fireRate);
 
   initial begin
+        //initial values
+        up = 0; rst = 0; loadMax = 01;
   forever begin
   #5
     shoot = fire & !loadingAmmo;    //You can't shoot while you are reloading
