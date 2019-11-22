@@ -52,7 +52,6 @@ module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input loadi
   reg shoot;
   wire newAmmo;
   Mux4 #(1) selMode(1'b0, 1'b0, 1'b1, 1'b0, mode_selector, mode);  //0010 is attack mode
-  //ammoCount run(clk, ammo, loadingAmmo, shoot, fireRate, newAmmo);   //run the counter
   reg rst, up;
   reg [1:0]loadMax;
   wire [8:0]ammoOut;
