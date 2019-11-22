@@ -9,6 +9,17 @@ module Adder(a, b, out);
   assign out = a + b;
 endmodule
 
+//Divide Module
+module Divide(a, b, out);
+  parameter k = 16;
+
+  input [k-1:0] a;
+  input [k-1:0] b;
+  output [k-1:0] out;
+
+  assign out = a / b;
+endmodule
+
 //This is the module for calculating the position in a single axis
 module Axis_Position (clk, pos_mode, jump_position, velocity);   
 
@@ -85,7 +96,7 @@ module Axis_Velocity(mode, speed);
   // The output of the mode multiplexer would be the velocity associated with that mode
   Mux4 #(2) velocity_mux(`STEALTH_OFFSET, `DEFENSE_OFFSET, `ATTACK_OFFSET, 2'b00, mode, offset);
 
-  assign velocity = speed / offset;
+  Divide #(k) divide(speed, offset, velocity);
 
 
 
