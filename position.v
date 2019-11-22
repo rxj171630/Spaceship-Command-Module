@@ -1,15 +1,3 @@
-`define X k-1:0
-`define Y 2*k-1:k
-`define Z 3*k-1:2*k
-
-`define RESET   'b0001
-`define ATTACK  'b0010
-`define DEFENSE 'b0100
-`define STEALTH 'b1000
-`define JUMP   'b0100
-`define NORMAL 'b0010
-
-
 //Adder Module
 module Adder(a, b, out);
   parameter k = 16;
