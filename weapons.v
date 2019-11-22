@@ -51,7 +51,7 @@ endmodule
 //=================================================
 //Run Counter
 //=================================================
-module ammoCount(input clk, input [8:0]ammoIn, input load, input fire, input [8:0]fireRate);
+module ammoCount(input clk, input [8:0]ammoIn, input load, input fire, input [8:0]fireRate, output [8:0]ammoOut);
   reg rst, up;
   reg [1:0]loadMax;
   wire [8:0]ammoOut;
@@ -63,18 +63,17 @@ module ammoCount(input clk, input [8:0]ammoIn, input load, input fire, input [8:
    	end
 endmodule
 
-module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input loadingAmmo, input fire, input [8:0]fireRate, output error);
+module weapons(input clk, input [3:0]mode_selector, input [8:0]ammo, input loadingAmmo, input fire, input [8:0]fireRate, output [8:0]newAmmo, output error);
   wire mode;
   reg error;
   reg shoot;
-  reg [8:0]newAmmo;
+  wire newAmmo;
   Mux4 #(1) selMode(1'b0, 1'b0, 1'b1, 1'b0, mode_selector, mode);  //0010 is attack mode
-  ammoCount run(clk, ammo, loadingAmmo, shoot, fireRate);   //run the counter
+  ammoCount run(clk, ammo, loadingAmmo, shoot, fireRate, newAmmo);   //run the counter
 
   initial begin
   forever begin
   #5
-    newAmmo = run.ammoOut;
     shoot = fire & !loadingAmmo;    //You can't shoot while you are reloading
     error = ((fire & (!mode)) | (mode & fire & (!ammo)));  //Trying to shoot in the wrong mode is an error. Trying to shoot with no ammo in the right mode is an error.
     end

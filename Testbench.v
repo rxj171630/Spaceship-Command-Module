@@ -20,9 +20,10 @@ module TestBench();
     reg [8:0]ammo;
     reg fire;
     reg [8:0]fireRate;
+    wire [8:0]newAmmo;
     reg loadingAmmo;
     wire error;
-    weapons try(clk, mode, ammo, loadingAmmo, fire, fireRate, error);
+    weapons try(clk, mode, ammo, loadingAmmo, fire, fireRate, newAmmo, error);
 
     reg rst, chrg, o2sup,atk;
     reg [k-1:0] shield, temp, pwr, o2;
@@ -71,7 +72,7 @@ module TestBench();
 		forever
 			begin
 				#10
-				$display(" %b | %b || %b | %5d | %5d | %5d | %5d | %5d | %5d ||    %d   |    %d   |     %d    |    %d    |   %b   ||%7d|%6d|%8d|%8d|%13b|",clk, mode, pos_mode, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, fire, loadingAmmo, try.newAmmo, fireRate, error,outpower, outtemp, outshield, outo2, fatal);
+				$display(" %b | %b || %b | %5d | %5d | %5d | %5d | %5d | %5d ||    %d   |    %d   |     %d    |    %d    |   %b   ||%7d|%6d|%8d|%8d|%13b|",clk, mode, pos_mode, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, fire, loadingAmmo, newAmmo, fireRate, error,outpower, outtemp, outshield, outo2, fatal);
 			end
         $display("FIXME NEGATIVE NUMBERS!!!!!!!!!!!!!!!!!");
 
