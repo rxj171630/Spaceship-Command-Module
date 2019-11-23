@@ -99,7 +99,7 @@ module TestBench();
 		begin
 			#2 //Offset the Square Wave
             #10 $display("Initialising");
-                mode = `RESET;  pos_mode = `RESET; fire = 0; ammo = 500; loadingAmmo = 1; pwr=7'b1111111; temp=7'b100010; shield=7'b1100100; o2=8'b11111111; o2sup=1; atk=0; chrg=1; rst=1;
+                mode = `RESET;  pos_mode = `RESET; speed = 0; fire = 0; ammo = 500; loadingAmmo = 1; pwr=7'b1111111; temp=7'b100010; shield=7'b1100100; o2=8'b11111111; o2sup=1; atk=0; chrg=1; rst=1;
             
             #10 $display("enableing Lifesupport Systems");
                 mode = `ATTACK; loadingAmmo = 0; fireRate = 2; chrg=0; rst=0; o2sup=0; fire = 0;
