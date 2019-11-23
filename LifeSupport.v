@@ -15,21 +15,21 @@ module LifeSupport(clk, rst,pwr,shield, chrg,atk, o2, o2sup, mode, temp, outshie
 //---------------------------------------------  
   wire [n-1:0] nextTe, nextSh, nextPwr, nextO2, outShield,outTemp, outPower,outDmg, outO2;
   
-  wire on, def, sth	;
+  wire  def, sth	;
   
-  assign def = (((~mode[3]&mode[2]&~mode[1]&~mode[0])===1)&&(outpower>0))? 1: 0; 
-  assign sth = (((mode[3]&~mode[2]&~mode[1]&~mode[0])===1)&&(outpower>0))? 1: 0;
+  assign def = (((~mode[3]&mode[2]&~mode[1]&~mode[0])===1)&&(outpower>0)&&(outo2>0))? 1: 0; 
+  assign sth = (((mode[3]&~mode[2]&~mode[1]&~mode[0])===1)&&(outpower>0)&&(outo2>0))? 1: 0;
   
 
 //---------------------------------------------  
 // Main Counter Control
 //--------------------------------------------- 
   
-  assign outShield    	=((def===1)||(outshield<=100)) ? outshield + 1 : outshield-1;
-  assign outDmg 		= ((atk===1)&&(outshield>0))? outshield - 5: outshield;
-  assign outTemp  		= ((temp  > outtemp)||(sth===1)) ? outtemp + 1 :outtemp - 1;
-  assign outPower 		= ((chrg===1)||(outpower===0)) ? outpower: outpower-1;
-  assign outO2 			= ((o2sup===1)||(outo2===0)) ? outo2: outo2-1;
+  assign outShield    	=((outshield<200)) ? outshield + 1 : outshield-1;
+  assign outDmg 		= ((outshield>5))? outshield - 5: 0;
+  assign outTemp  		= ((sth===1)) ? outtemp + 1 :outtemp ;
+  assign outPower 		= ((outpower>0)) ? outpower-1: outpower;
+  assign outO2 			= ((outo2>0)) ? outo2-1: outo2;
   assign fatal			=((outtemp<100)&&(outo2!=0)&&(outshield>0))? 0: 1;
   
   
