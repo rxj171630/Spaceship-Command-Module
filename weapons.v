@@ -59,18 +59,16 @@ module weapons(input clk, input [3:0]mode, input [8:0]ammo, input loadingAmmo, i
   Mux4 #(1) selMode(1'b0, 1'b0, 1'b1, 1'b0, mode, mode_selector);  //0010 is attack mode
   reg rst, up;
   reg [1:0]loadMax;
-  wire [8:0]ammoOut;
   AmmoCounter sat(clk, rst, up, shoot, loadingAmmo, loadMax, ammo, newAmmo, fireRate);
 
   initial begin
-  forever begin
-  #10
         //initial values
         up = 0; rst = 0; loadMax = 01;
-        shoot = fire & !loadingAmmo &!error;
-        error = ((fire & (!mode_selector)) | (mode_selector & fire & (!ammo)));
-
-  end
+  forever begin
+  #5
+    shoot = fire & !loadingAmmo;    //You can't shoot while you are reloading
+    error = ((fire & (!mode_selector)) | (mode_selector & fire & (!ammo)));  //Trying to shoot in the wrong mode is an error. Trying to shoot with no ammo in the right mode is an error.
+    end
   end
 
 endmodule
