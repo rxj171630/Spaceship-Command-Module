@@ -9,9 +9,9 @@
 `define JUMP    'b0100
 `define NORMAL  'b0010
 
+`include "common.v"
 `include "position.v"
 `include "weapons.v"
-`include "common.v"
 `include "LifeSupport.v"
 
 
@@ -95,17 +95,42 @@ module TestBench();
 	initial
 		begin
 			#2 //Offset the Square Wave
-            #10 mode = `RESET;  pos_mode = `RESET; fire = 0; ammo = 500; loadingAmmo = 1; pwr=7'b1111111; temp=7'b100010; shield=7'b1100100; o2=8'b11111111; o2sup=1; atk=0; chrg=1; rst=1;
-            #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = 1; speed[`Y] = 1; speed[`Z] = 1; loadingAmmo = 0; fireRate = 2; fire = 1; chrg=0; rst=0; o2sup=0;
-			#50
-            #10 mode = `ATTACK; pos_mode = `JUMP;   jump_position[`X] = 100; jump_position[`Y] = 100; jump_position[`Z] = 100; loadingAmmo = 1; ammo = 200;
-            #10 mode = `ATTACK; pos_mode = `NORMAL; speed[`X] = 4; speed[`Y] = 4; speed[`Z] = 4; loadingAmmo = 0; fireRate = 1;
+            #10 $display("Initialising");
+                mode = `RESET;  pos_mode = `RESET; fire = 0; ammo = 500; loadingAmmo = 1; pwr=7'b1111111; temp=7'b100010; shield=7'b1100100; o2=8'b11111111; o2sup=1; atk=0; chrg=1; rst=1;
+            
+            #10 $display("enableing Lifesupport Systems");
+                mode = `ATTACK; loadingAmmo = 0; fireRate = 2; chrg=0; rst=0; o2sup=0; fire = 0;
+            #50
+
+            #10 $display("Firing Weapons");
+			    fire = 1;
+            #50
+
+            #10 $display("Speed = 1,1,1");
+                speed[`X] = 1; speed[`Y] = 1; speed[`Z] = 1;
+            #50
+
+            #10 $display("Jumping to 100, 100, 100");
+                pos_mode = `JUMP; jump_position[`X] = 100; jump_position[`Y] = 100; jump_position[`Z] = 100;
+            #10 pos_mode = `NORMAL;
+            #50
+
+            #10 $display("Speed = 6, 6, 6");
+                speed[`X] = 6; speed[`Y] = 6; speed[`Z] = 6;
+			#40
+            
+            #10	$display("Getting Attacked");
+                atk=1;
+			#150
+            
+            #10 $display("Switching to Steath Mode");
+                mode= `STEALTH; atk = 0;
 			#100
-            #10 fire = 0;
-            #20	atk=1;
-			#400 mode= `STEALTH;
-			#400
-			#300
+
+            #10 $display("Switching to Defense Mode");
+                mode = `DEFENSE;
+            #100
+            
 			$finish;
 		end
 
