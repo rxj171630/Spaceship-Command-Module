@@ -129,11 +129,7 @@ module TestBench();
             #10 $display("Switching to Steath Mode");
                 mode= `STEALTH; atk = 0;
 			#100
-            #10 $display("Attempting to fire");
-                fire = 1;
-      #50
-            #10 $display("Stop trying to fire");
-                fire = 0;
+            
             #10 $display("Switching to Defense Mode");
                 mode = `DEFENSE;
             #100
