@@ -60,16 +60,15 @@ module weapons(input clk, input [3:0]mode, input [8:0]ammo, input loadingAmmo, i
   reg rst, up;
   reg [1:0]loadMax;
   wire [8:0]ammoOut;
-  wire notLoad;
-  wire notMode;
-  wire arg1;
-  wire arg2;
-  wire notAmmo;
   AmmoCounter sat(clk, rst, up, shoot, loadingAmmo, loadMax, ammo, newAmmo, fireRate);
 
   initial begin
         //initial values
         up = 0; rst = 0; loadMax = 01;
+        shoot = fire & !loadingAmmo;
+        error = ((fire & (!mode_selector)) | (mode_selector & fire & (!ammo)));
+
+  end
   end
   not n1(notAmmo, ammo);
   not n2(notLoad, loadingAmmo);
