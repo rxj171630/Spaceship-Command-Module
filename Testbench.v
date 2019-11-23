@@ -92,7 +92,9 @@ module TestBench();
 			#100
             #10 fire = 0;
             #20	atk=1;
-			#400 mode= `STEALTH;
+			#100 mode= `STEALTH; fire = 1;
+      #100 fire = 0;
+      #200
 			#400
 			#300
 			$finish;
