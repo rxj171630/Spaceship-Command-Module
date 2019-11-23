@@ -76,17 +76,20 @@ module TestBench();
 		$display("OXYGEN - 32-bit - How much oxygen do we have left?");
 		$display("FATAL ERROR - 32-bit - Is the crew dead if the temperature reaches above 100 or runs out of oxygen?");
         $display("");
-    $display("  Global  ||              Positioning Systems                     ||                  Weapons Systems                 ||                Life Support                  |");
-    $display("----------||------------------------------------------------------||--------------------------------------------------||----------------------------------------------|");
-    $display("CLK| MODE ||P MODE| POS X | POS Y | POS Z | VEL X | VEL Y | VEL Z || FIRING | RELOAD | AMMO COUNT | FIRE RATE | ERROR || POWER | TEMP | SHIELD | OXYGEN | FATAL ERROR |");
-	$display("---+------++------+-------+-------+-------+-------+-------+-------++--------+--------+------------+-----------+-------++-------+------+--------+--------+-------------+");
+        $display("  Global  ||              Positioning Systems                     ||                  Weapons Systems                 ||                Life Support                  |");
+        $display("----------||------------------------------------------------------||--------------------------------------------------||----------------------------------------------|");
+        $display("CLK| MODE ||P MODE| POS X | POS Y | POS Z | VEL X | VEL Y | VEL Z || FIRING | RELOAD | AMMO COUNT | FIRE RATE | ERROR || POWER | TEMP | SHIELD | OXYGEN | FATAL ERROR |");
+	    $display("---+------++------+-------+-------+-------+-------+-------+-------++--------+--------+------------+-----------+-------++-------+------+--------+--------+-------------+");
 		forever
 			begin
 				#10
 				$display(" %b | %b || %b | %5d | %5d | %5d | %5d | %5d | %5d ||    %d   |    %d   |     %d    |    %d    |   %b   ||%7d|%6d|%8d|%8d|%13b|",clk, mode, pos_mode, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, fire, loadingAmmo, newAmmo, fireRate, error,outpower, outtemp, outshield, outo2, fatal);
-			end
-        $display("FIXME NEGATIVE NUMBERS!!!!!!!!!!!!!!!!!");
-
+                if(fatal==1'b1)
+                begin
+                    $display("FATAL ERROR -- QUITTING");
+                    $finish;
+                end
+            end
     end
 
 
@@ -130,7 +133,13 @@ module TestBench();
             #10 $display("Switching to Defense Mode");
                 mode = `DEFENSE;
             #100
+
+            #10 $display("Getting Attacked");
+                atk = 1;
+            #150
             
+
+
 			$finish;
 		end
 

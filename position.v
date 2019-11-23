@@ -96,7 +96,7 @@ module Axis_Velocity(mode, speed);
   // The output of the mode multiplexer would be the velocity associated with that mode
   Mux4 #(2) velocity_mux(`STEALTH_OFFSET, `DEFENSE_OFFSET, `ATTACK_OFFSET, 2'b00, mode, offset);
 
-  Divide #(k) divide(speed, offset, velocity);
+  Divide #(k) divide(speed, {{k-2{1'b0}},offset}, velocity);
 
 
 
