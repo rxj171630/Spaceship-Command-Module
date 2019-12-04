@@ -82,7 +82,7 @@ module TestBench();
 	    $display("---+------++------+-------+-------+-------+-------+-------+-------+-------+-------+-------++--------+--------+------------+-----------+-------++-------+------+--------+--------+-------------+");
 		forever
 			begin
-				#10
+				#5
 				$display(" %b | %b || %b | %5d | %5d | %5d | %5d | %5d | %5d | %5d | %5d | %5d ||    %d   |    %d   |     %d    |    %d    |   %b   ||%7d|%6d|%8d|%8d|%13b|",clk, mode, pos_mode, speed[`X], speed[`Y], speed[`Z], position.x, position.y, position.z, velocity.x, velocity.y, velocity.z, fire, loadingAmmo, newAmmo, fireRate, error,outpower, outtemp, outshield, outo2, fatal);
                 if(fatal==1'b1)
                 begin
