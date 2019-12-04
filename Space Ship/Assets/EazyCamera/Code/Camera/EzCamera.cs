@@ -246,15 +246,9 @@ public class EzCamera : MonoBehaviour
             }
         }
 
-        // Zoom the camera using the middle mouse button + drag
-        if (Input.GetMouseButton(2) || Input.GetKey(KeyCode.Z))
-        {
-            m_zoomDelta = Input.GetAxis(ExtensionMethods.MOUSEY);
-        }
-        else
-        {
-            m_zoomDelta = 0;
-        }
+
+        m_zoomDelta = Input.GetAxis("Mouse ScrollWheel") * -10;
+
     }
 
     public void UpdatePosition()

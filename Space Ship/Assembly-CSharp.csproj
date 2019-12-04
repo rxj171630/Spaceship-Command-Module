@@ -91,31 +91,31 @@
     <None Include="Assets\EazyCamera\README.txt" />
     <None Include="Assets\Sketchfab For Unity\Dependencies\Shaders\GLTFPackOccMetalRough.shader" />
     <Reference Include="Unity.Timeline.Editor">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Rider.Editor">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.8f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -295,16 +295,16 @@
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.8f1/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
     </Reference>
     <Reference Include="GLTFSerialization">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Assets/Sketchfab For Unity/Dependencies/Libraries/GLTFSerialization.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Assets/Sketchfab For Unity/Dependencies/Libraries/GLTFSerialization.dll</HintPath>
     </Reference>
     <Reference Include="Ionic.Zip.Unity">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Assets/Sketchfab For Unity/Dependencies/Libraries/Ionic.Zip.Unity.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Assets/Sketchfab For Unity/Dependencies/Libraries/Ionic.Zip.Unity.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Assets/Sketchfab For Unity/Dependencies/Libraries/Newtonsoft.Json.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Assets/Sketchfab For Unity/Dependencies/Libraries/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="UnityGLTF">
-      <HintPath>C:/Users/austin/Documents/Unity Projects/Space Ship/Assets/Sketchfab For Unity/Dependencies/Libraries/UnityGLTF.dll</HintPath>
+      <HintPath>C:/Users/austin/Google Drive/Homework/CS 4341/Spaceship-Command-Module/Space Ship/Assets/Sketchfab For Unity/Dependencies/Libraries/UnityGLTF.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.8f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>

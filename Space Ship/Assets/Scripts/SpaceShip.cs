@@ -14,7 +14,16 @@ public class SpaceShip : MonoBehaviour
     public Text velocityText;
     public Text positionText;
 
+    public Text oxygenText;
+    public Text shieldsText;
+    public Text powerText;
+    public Text temperatureText;
+    public Text ammoText;
+
+    public GameObject roundPrefad;
+
     public GameObject jumpSphere;
+    public GameObject shield;
 
     readonly float rotSpeed = 100;
     bool rotating = false;
@@ -30,9 +39,12 @@ public class SpaceShip : MonoBehaviour
     {
         ls = new LifeSupport();
         weapons = new Weapons();
+
         exhaust = this.GetComponentInChildren<ParticleSystem>();
         var particleEmission = exhaust.emission;
         particleEmission.enabled = false;
+
+        shield.SetActive(false);
         jumpSphere.transform.localScale = Vector3.zero;
     }
 
@@ -134,11 +146,42 @@ public class SpaceShip : MonoBehaviour
     }
     public void Fire()
     {
+        GameObject round = GameObject.Instantiate(roundPrefad);
+        Rigidbody rb = round.GetComponentInChildren<Rigidbody>();
+        rb.velocity = velocity + transform.forward * 10;
+
         //TODO
+        
     }
+
+    IEnumerator BlipShield()
+    {
+        float t = 0;
+        while (t < .1)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+        shield.SetActive(false);
+        while (t < .2)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+        shield.SetActive(true);
+        while (t < .3)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+        shield.SetActive(false);
+    }
+
     public void Hit()
     {
         //TODO
+        shield.SetActive(true);
+        StartCoroutine(BlipShield());
     }
 
 

@@ -68,19 +68,12 @@ public class EzOrbitState : EzCameraState
 
     public override void HandleInput()
     {
-        if (m_controlledCamera.OribtEnabled && Input.GetMouseButtonDown(0))
-        {
-            m_controlledCamera.SetState(State.ORBIT);
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            m_controlledCamera.SetState(State.FOLLOW);
-            return;
-        }
+
+        m_controlledCamera.SetState(State.ORBIT);
 
         // cache the inputs
-        float horz = Input.GetAxis(MOUSEX);
-        float vert = Input.GetAxis(MOUSEY);
+        float horz = Input.GetAxis("Horizontal") * -1;
+        float vert = Input.GetAxis("Vertical");
 
         m_horizontalInput = horz;
         m_verticalInput = vert;
